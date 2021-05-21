@@ -28,19 +28,19 @@ Next Open Terminal where you want to install and run commands:
 curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.0.tar.gz | tar xz
 cd ST7735_TFT_RPI_1.0
 make 
-sudo /bin/test
+sudo ./bin/test
 ```
 
 Features
 ----------------------
 
-**TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels, No SD card**
+**TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels**
 
 ![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
  
 This Color TFT LCD display has 128 x 128 resolution.
 It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.3V input voltage, 
-the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1. No SD Card. 
+the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1. 
 Backlight control is left to user.
 
 **PCB Version**
@@ -54,7 +54,7 @@ There are 4 types of the ST7735 TFT display supported.
 1. ST7735B controller 
 2. ST7735R Green Tab
 3. ST7735R Red Tab
-4. ST7735R Black Tab (ST7735S)
+4. ST7735S Black Tab 
 
 **SPI**
 
