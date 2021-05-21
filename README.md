@@ -28,7 +28,7 @@ Next Open Terminal where you want to install and run commands:
 curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.0.tar.gz | tar xz
 cd ST7735_TFT_RPI_1.0
 make 
-sudo /bin/test) 
+sudo /bin/test
 ```
 
 Features
@@ -45,7 +45,7 @@ Backlight control is left to user.
 
 **PCB Version**
 
-It may  work on other TFT displays using the different init functions, but not tested.
+It should work on other TFT displays using the different init functions, but not tested.
 In the header file in USER OPTION 1 PCB_TYPE select your PCB.
 default is red. User can adjust pixel height, pixel width and screen offsets in the header file. 
 
