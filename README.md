@@ -14,18 +14,22 @@ no SD card holder.
 
 * Author: Gavin Lyons
 * Port of my PIC library at [github link.](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
-
+* Created: May 2021
 
 Installation
 ------------------------------
 
-0. bcm2835 is a dependency it interfaces with SPI/GPIO, and provides timing delays.
-1. Install the C libraries of bcm2835, see: http://www.airspayce.com/mikem/bcm2835/ 
-2. Next Open Terminal where you want to install/
-3. curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.0.tar.gz | tar xz
-4. cd ST7735_TFT_RPI_1.0
-5. make 
-6. make run (runs sudo /bin/test) 
+bcm2835 is a dependency it interfaces with SPI/GPIO, and provides timing delays.
+Install the C libraries of bcm2835, see: http://www.airspayce.com/mikem/bcm2835/ 
+
+Next Open Terminal where you want to install and run commands:
+
+```sh
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.0.tar.gz | tar xz
+cd ST7735_TFT_RPI_1.0
+make 
+sudo /bin/test) 
+```
 
 Features
 ----------------------
@@ -93,12 +97,12 @@ in this library.
 
 | Function Name | Colour support | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |  
-| drawIcon | bi-colour | 8x(0-127) , 128 bytes max  | Data vertcially addressed |  
-| drawBitmap | bi-colour | 128*128 , 2048 bytes max | Data horioznatlly  addressed |  
+| drawIcon | bi-colour | 8x(0-127) , 128 bytes max  | Data vertically addressed |  
+| drawBitmap | bi-colour | 128*128 , 2048 bytes max | Data horizontally  addressed |  
 | drawBitmap16 | 16 bit color 565 BMP files | 128*128 32K max | ------ |  
 | drawBitmap24  | 24 bit color BMP files | 128*128 48K max | Converted by software to 16-bit color  |
   
-Bitmap size in kiloBytes = screenwidth*screenheight*bitsperPixel/(1024*8)
+Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
 
 **Connections**
 
@@ -120,7 +124,7 @@ Connections as setup in main.c test file.
 3. You can connect VCC to 5V if there is a 3.3 volt regulator on back of TFT module.
 4. Pick any GPIO you want for HW SPI for SW SPI: reset and DC lines are flexible.
 
-![ wiring ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/master/extra/images/wiring.jpg)
+![ wiring ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/wiring.jpg)
 
 Output
 -----------------------
@@ -138,4 +142,4 @@ Output of some of the test routine's. Left to right, top to bottom.
 9. 16-bit color bitmap test image
 
 ![ pic ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/9.jpg)
-![ pic1 ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/master/extra/images/4.jpg)
+![ pic1 ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/4.jpg)
