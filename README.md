@@ -1,3 +1,12 @@
+Table of contents
+---------------------------
+
+  * [Overview](#overview)
+  * [Usage](#usage)
+  * [Hardware](#hardware)
+  * [Features](#features)
+
+
 Overview
 --------------------------------------------
 * Name: ST7735_TFT_RPI
@@ -11,14 +20,52 @@ no SD card holder.
 4. Graphics class included.
 5. Full Bitmap supported.
 6. Hardware and Software SPI 
+7. Dependency: bcm2835 Library
 
 * Author: Gavin Lyons
 * Port of my PIC library at [github link.](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 * Created: May 2021
 
-Installation
+
+Usage
 ------------------------------
 
+1. Make sure SPI bus is enabled on your raspberry PI
+
+2. Install the bcm2835 Library (at time of writing latest version is 1.68.)
+	* The bcm2835 libray is a dependency and provides SPI bus, delays and GPIO control.
+	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
+
+3. Download the ST7735_TFT_RPI library 
+	* Open a Terminal in a folder where you want to create your project.
+	* Run following commands to do this.
+```sh
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.0.tar.gz | tar xz
+cd ST7735_TFT_RPI_1.0
+```
+
+4. Build the project, by running the makefile included.
+	* Run make to run the makefile and build the project.
+	* The makefile does NOT install to system at present, it builds the code in that folder.
+	* 
+```sh
+make
+```
+
+5. Run the program
+	* The makefile creates a executable binary test file at ./bin/test
+ * It runs a series of 15 tests on the TFT showing features of lib. 
+	* Be sure to use "sudo" as the bcm2835 demands root permissions [ see here for more details](http://www.airspayce.com/mikem/bcm2835/) 
+
+```sh
+sudo ./bin/test
+```
+
+6. Copy the library code files into your project folder directory however you wish to organise it 
+	* The header files are in the include folder in my repo.
+	* And the soucre files are in src in my repo.
+	* If you are not using included makefile to build be sure to include -lbcm2835 flag.
+	
 bcm2835 is a dependency it interfaces with SPI/GPIO, and provides timing delays.
 Install the C libraries of bcm2835, see: http://www.airspayce.com/mikem/bcm2835/ 
 
