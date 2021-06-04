@@ -45,14 +45,14 @@ Installation
 	* Run following command to download from github.
     
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/STT735_TFT_RPI/archive/1.1.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.1.tar.gz | tar xz
 ```
 
 4. Run "make" to run the makefile in "src" folder to install library, it will be 
     installed to usr/lib and usr/include
     
 ```sh
-cd STT735_TFT_RPI-1.1
+cd ST7735_TFT_RPI-1.1
 sudo make
 ```
 
