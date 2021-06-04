@@ -2,10 +2,10 @@ Table of contents
 ---------------------------
 
   * [Overview](#overview)
-  * [Usage](#usage)
+  * [Installation](#installation)
   * [Hardware](#hardware)
   * [Features](#features)
-
+  * [Output](#output)
 
 Overview
 --------------------------------------------
@@ -25,47 +25,49 @@ no SD card holder.
 * Author: Gavin Lyons
 * Port of my PIC library at [github link.](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 * Created: May 2021
+* Developed on 
+    1. Raspberry PI 3 model b, 
+    2. C++ complier g++ (Raspbian 6.3.0-18)
+    3. Raspbian 9.13 stretch OS
+    4. bcm2835 Library 1.68 
 
-
-Usage
+Installation
 ------------------------------
 
-1. Make sure SPI bus is enabled on your raspberry PI
+1. Make sure SPIbus is enabled on your raspberry PI
 
-2. Install the bcm2835 Library (at time of writing latest version is 1.68.)
-	* The bcm2835 libray is a dependency and provides SPI bus, delays and GPIO control.
+2. Install the dependency bcm2835 Library if not installed (at time of writing latest version is 1.68.)
+	* The bcm2835 library is a dependency and provides I2C bus, delays and GPIO control.
 	* Install the C libraries of bcm2835, [Installation instructions here](http://www.airspayce.com/mikem/bcm2835/)
 
-3. Download the ST7735_TFT_RPI library 
-	* Open a Terminal in a folder where you want to create your project.
-	* Run following commands to do this.
+3. Download the STT735_TFT_RPI library 
+	* Open a Terminal in a folder where you want to download,build & test library
+	* Run following command to download from github.
+    
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.0.tar.gz | tar xz
-cd ST7735_TFT_RPI_1.0
+curl -sL https://github.com/gavinlyonsrepo/STT735_TFT_RPI/archive/1.1.tar.gz | tar xz
 ```
 
-4. Build the project, by running the makefile included.
-	* Run make to run the makefile and build the project.
-	* The makefile does NOT install to system at present, it builds the code in that folder.
-	
+4. Run "make" to run the makefile in "src" folder to install library, it will be 
+    installed to usr/lib and usr/include
+    
 ```sh
+cd STT735_TFT_RPI-1.1
+sudo make
+```
+
+5. Next step is to test TFT and installed library with the main.c test file.
+Wire up your OLED. Next enter the example folder and run the makefile in THAT folder, 
+This makefile builds the examples file using the just installed library.
+and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/) 
+you should now see the test routines in that file running on TFT. 
+
+```sh
+cd example/
 make
+sudo bin/test
 ```
 
-5. Run the program
-	* The makefile creates a executable binary test file at ./bin/test
- 	* It runs a series of 15 tests on the TFT showing features of lib. 
-	* Be sure to use "sudo" as the bcm2835 demands root permissions [ see here for more details](http://www.airspayce.com/mikem/bcm2835/) 
-
-```sh
-sudo ./bin/test
-```
-
-6. Copy the library code files into your project folder directory however you wish to organise it. 
-	* The header files are in the include folder in my repo.
-	* And the soucre files are in src in my repo.
-	* If you are not using included makefile to build be sure to include -lbcm2835 flag in yours.
-	
 Features
 ----------------------
 
@@ -81,7 +83,7 @@ Backlight control is left to user.
 **PCB Version**
 
 It should work on other TFT displays using the different init functions, but not tested.
-In the header file in USER OPTION 1 PCB_TYPE select your PCB.
+In the header file in USER OPTION PCB_TYPE select your PCB.
 default is red. User can adjust pixel height, pixel width and screen offsets in the header file. 
 
 There are 4 types of the ST7735 TFT display supported.
@@ -95,23 +97,22 @@ There are 4 types of the ST7735 TFT display supported.
 
 This library supports both Hardware SPI and software SPI. 
 Change the define a top of header file
-to switch between the two. USER OPTION 3 SPI TYPE. 
+to switch between the two. USER OPTION SPI TYPE. 
 Uses bcm2835 library. 
 Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
 SPI settings can be viewed/changed in TFT_SPI_Initialize function.
 
 **Files**
 
+There is a TFT library (ST7735_TFT.c and ST7735_TFT.h),
+and a fonts file that contains ASCII pixel fonts.
+
+In example folder:
 The Main.c file contains tests showing library functions.
-There is also an TFT library (ST7735_TFT.c and ST7735_TFT.h),
-and five fonts file that contains ASCII pixel fonts.
 A bitmap data file contains data for bi-color bitmaps and icons.
 The color bitmaps used in testing are in bitmap folder, 3 16-bit and 3 24-bit images.
 
 **Fonts**
-
-All Font fonts included by default to exclude unused font files see
-USER OPTION 2 FONT at start of header file.
 
 Five fonts available : 
 
@@ -148,7 +149,7 @@ Connections as setup in main.c test file.
 | 1 | LED | VCC |  VCC |
 | 2 | SCLK | SPI_CLK | GPIO11 |
 | 3 | SDA | SPI_MOSI | GPIO10 |
-| 4 | A0/DC | GPIO23 | GPIO23  |
+| 4 | A0/DC | GPIO24 | GPIO24  |
 | 5 | RESET | GPI025  | GPIO25 | 
 | 6 | SS/CS | SPI_CE0 | GPIO8 |
 | 7 | GND | GND | GND |

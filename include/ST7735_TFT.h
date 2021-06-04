@@ -17,6 +17,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "ST7735_TFT_Font.h"
+
 // ******** USER OPTION 1 PCB_TYPE *********
 // PCB type , pick one and one ONLY
 #define TFT_PCB_RED
@@ -25,38 +27,13 @@
 //#define  TFT_PCB_GENERIC
 // ****************************************
 
-// ****** USER OPTION 2 FONT ******
-#define TFT_Font_One
-#define TFT_Font_Two
-#define TFT_Font_Three
-#define TFT_Font_Four
-#define TFT_Font_Five
-
-// ******** USER OPTION 3 SPI TYPE ***********
+// ******** USER OPTION 2 SPI TYPE ***********
 // SPI TFT module connections
 // *** If software SPI module is used, comment this line OUT ***
 #define TFT_SPI_HARDWARE
 // *******************************************
 
-#ifdef TFT_Font_One
-#include "Font_One.h" // Default 5X8
-#endif
-#ifdef TFT_Font_Two
-#include "Font_Two.h" // Thick 7X8  (NO LOWERCASE LETTERS)
-#endif
-#ifdef TFT_Font_Three
-#include "Font_Three.h" // Seven segment 4X8
-#endif
-#ifdef TFT_Font_Four
-#include "Font_Four.h" // Wide  8X8 (NO LOWERCASE LETTERS)
-#endif
-#ifdef TFT_Font_Five
-#include "Font_Five.h" // bigNums 16 by 32 1-10 +: only
-#endif
-
 // *********** DEFINES ****************
-
-
 // ******** ST7735 registers ********
 #define ST7735_NOP     0x00 // Non operation
 #define ST7735_SWRESET 0x01 // Soft Reset

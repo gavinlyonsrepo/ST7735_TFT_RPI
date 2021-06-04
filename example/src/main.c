@@ -10,10 +10,12 @@
 
 // ************ libraries **************
 #include <bcm2835.h> // for SPI GPIO and delays.
-#include "ST7735_TFT.h"
 #include <stdio.h> // for printf
-#include "Bi_Color_Bitmap.h" // Data for test 11 and 12.
 #include <time.h> // for test 11
+
+#include "ST7735_TFT.h"
+#include "Bi_Color_Bitmap.h" // Data for test 11 and 12.
+
 
 // *********** Defines **************
 #define TEST_DELAY1 1000
@@ -49,7 +51,7 @@ void Test10(void); // change modes test // Invert, display on/off and Sleep.
 void Test11(void); // icons, small bi-color bitmaps, BigNum font (5)
 void Test12(void); // two color bitmap
 void Test14(void); // 24 color bitmap
-void Test15(void); //16 color bitmap 
+void Test15(void); // 16 color bitmap 
 
 void EndTests(void);
 
@@ -66,7 +68,6 @@ int main(void)
 
 	while (1) 
 	{
-		
 		Test0();
 		Test1A();
 		Test1B();
@@ -84,10 +85,11 @@ int main(void)
 		Test12();
 		Test14();
 		Test15();
-		
-		EndTests();
-		return 0;
+		break;
 	}
+	
+	EndTests();
+	return 0;
 }
 // ********* End OF MAIN ********
 
@@ -489,6 +491,7 @@ void Test15(void)
 	
 	bcm2835_delay(TEST_DELAY5);
 	TFTfillScreen(ST7735_BLACK);
+	
 }
 
 void EndTests(void)
@@ -497,10 +500,10 @@ void EndTests(void)
 	TFTdrawText(5, 50, "Tests over", ST7735_GREEN, ST7735_BLACK, 2);
 	bcm2835_delay(TEST_DELAY5);
 	
-	TFT_PowerDown(); // Power down device
 #ifdef TFT_SPI_HARDWARE  
 	TFT_SPIoff(); //Stop the hardware SPI
 #endif
+	TFT_PowerDown(); // Power down device
 	bcm2835_close(); // Close the bcm2835 library
 	printf("TFT End\r\n");
 }

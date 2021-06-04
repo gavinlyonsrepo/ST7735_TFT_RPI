@@ -806,28 +806,25 @@ void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, u
 	if ((c < ' ') || (c > '~'))
 		c = '?';
 	for (i = 0; i < _CurrentFontWidth; i++) {
-		uint8_t line;
-		switch (_FontNumber) {
+		uint8_t line =0;
+		switch (_FontNumber) 
+		{
 			case 1:
-#ifdef TFT_Font_One
 				line = Font_One[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
-#endif
-				break;
+			break;
 			case 2:
-#ifdef TFT_Font_Two
 				line = Font_Two[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
-#endif
-				break;
+			break;
 			case 3:
-#ifdef TFT_Font_Three
 				line = Font_Three[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
-#endif
-				break;
+			break;
 			case 4:
-#ifdef TFT_Font_Four
 				line = Font_Four[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
-#endif
-				break;
+			break;
+			default:
+				printf("Error wrong font number set must be 1-4\n");
+				return;
+			break;
 		}
 		for (j = 0; j < 7; j++, line >>= 1) {
 			if (line & 0x01) {
@@ -1015,7 +1012,8 @@ void TFTFontNum(uint8_t FontNumber) {
 	enum TFT_Font_width_TFT setfontwidth;
 	_FontNumber = FontNumber;
 
-	switch (_FontNumber) {
+	switch (_FontNumber) 
+	{
 		case 1: _CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
 			break; // Norm default 5 by 8
 		case 2: _CurrentFontWidth = (setfontwidth = FONT_W_SEVEN);
@@ -1026,6 +1024,9 @@ void TFTFontNum(uint8_t FontNumber) {
 			break; // Wide  8 by 8 (NO LOWERCASE LETTERS)
 		case 5: _CurrentFontWidth = (setfontwidth = FONT_W_16);
 			break; // bignums 16 by 32 (NUMBERS ONLY)
+		default:
+			printf("Error : Wrong font number Set must be 1-5\n");
+		break;
 	}
 }
 
@@ -1178,7 +1179,11 @@ void TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h) {
 
 void TFTdrawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg) 
 {
-#ifdef TFT_Font_Five
+	if (_FontNumber != 5) 
+	{
+		printf("Error : Wrong font number Set must be 5\n");
+		return;
+	}
 	uint8_t i, j;
 	uint8_t ctemp = 0, y0 = y; 
 
@@ -1200,7 +1205,6 @@ void TFTdrawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_
 			}
 		}
 	}
-#endif
 }
 
 // Desc: Writes text string (*ptext) on the TFT 
@@ -1210,8 +1214,13 @@ void TFTdrawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_
 // Param 5: background color
 // Notes for font 5 only "bignums" 
 
-void TFTdrawTextBigNum(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg) {
-	
+void TFTdrawTextBigNum(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg) 
+{
+	if (_FontNumber != 5) 
+	{
+		printf("Error : Wrong font number Set must be 5\n");
+		return;
+	}
 	const uint8_t charSizeY = 32;
 	while (*pText != '\0') 
 	{
