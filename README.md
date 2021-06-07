@@ -1,3 +1,5 @@
+![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
+
 Table of contents
 ---------------------------
 
@@ -12,13 +14,12 @@ Overview
 * Name: ST7735_TFT_RPI
 * Description:
 
-0. Library for TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
-no SD card holder.
-1. Dynamic install-able Raspberry Pi C library, gcc complier.
+0. C Library for TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
+1. Dynamic install-able Raspberry Pi C library.
 2. Inverse colour, rotate, sleep, idle mode & verticaly scroll methods supported.
 3. Five fonts
 4. Graphics class included.
-5. 24 bit and 16 color Bitmap supported.
+5. 24 bit colour , 16 bit color & bi-color Bitmaps supported.
 6. Hardware and Software SPI
 7. Dependency: bcm2835 Library
 
@@ -48,7 +49,7 @@ Installation
 curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.1.tar.gz | tar xz
 ```
 
-4. Run "make" to run the makefile in "src" folder to install library, it will be
+4. Run "make" to run the makefile to install library, it will be
     installed to usr/lib and usr/include
 
 ```sh
@@ -72,8 +73,6 @@ Features
 ----------------------
 
 **TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels**
-
-![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
 
 This Color TFT LCD display has 128 x 128 resolution.
 It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.3V input voltage,
@@ -113,7 +112,8 @@ A bitmap data file contains data for bi-color bitmaps and icons tests.
 The color bitmaps used in testing are in bitmap folder, 3 16-bit and 3 24-bit images.
 
 There are two makefiles
-    1. Makefile in root directory builds and installs library at a system level.
+
+    1. Makefile at root directory builds and installs library at a system level.
     2. Makefile in example directory build example file to an executable.
 
 
@@ -138,10 +138,10 @@ in this library.
 
 | Function Name | Colour support | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |
-| drawIcon | bi-colour | 8x(0-127) , 128 bytes max  | Data vertically addressed |
-| drawBitmap | bi-colour | 128*128 , 2048 bytes max | Data horizontally  addressed |
-| drawBitmap16 | 16 bit color 565 BMP files | 128*128 32K max | ------ |
-| drawBitmap24  | 24 bit color BMP files | 128*128 48K max | Converted by software to 16-bit color  |
+| drawIcon | bi-colour | 8 x(0-127) , 128 bytes max  | Data vertically addressed |
+| drawBitmap | bi-colour | 128 by 128 , 2048 bytes max | Data horizontally  addressed |
+| drawBitmap16 | 16 bit color 565 BMP files | 128 by 128 = 32K max | ------ |
+| drawBitmap24  | 24 bit color BMP files | 128 by 128 = 48K max | Converted by software to 16-bit color  |
 
 Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
 
