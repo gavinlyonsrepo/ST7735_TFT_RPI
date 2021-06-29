@@ -5,8 +5,8 @@ Table of contents
 
   * [Overview](#overview)
   * [Installation](#installation)
+  * [Features](#features)  
   * [Hardware](#hardware)
-  * [Features](#features)
   * [Output](#output)
 
 Overview
@@ -145,7 +145,8 @@ in this library.
 
 Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
 
-**Connections**
+Hardware
+----------------------
 
 Connections as setup in main.c test file.
 
