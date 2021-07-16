@@ -14,6 +14,8 @@
 
 uint8_t _FontNumber = 1;
 uint8_t _CurrentFontWidth = 5;
+uint8_t _CurrentFontoffset = 0x20;
+uint8_t _CurrentFontheight = 8;
 uint8_t _currentMode = 0;
 bool _wrap = true;
 bool _hardwareSPI;
@@ -810,16 +812,16 @@ void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, u
 		switch (_FontNumber) 
 		{
 			case 1:
-				line = Font_One[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
+				line = Font_One[(c - _CurrentFontoffset ) * _CurrentFontWidth + i];
 			break;
 			case 2:
-				line = Font_Two[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
+				line = Font_Two[(c - _CurrentFontoffset ) * _CurrentFontWidth + i];
 			break;
 			case 3:
-				line = Font_Three[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
+				line = Font_Three[(c - _CurrentFontoffset ) * _CurrentFontWidth + i];
 			break;
 			case 4:
-				line = Font_Four[(c - TFT_ASCII_OFFSET) * _CurrentFontWidth + i];
+				line = Font_Four[(c - _CurrentFontoffset ) * _CurrentFontWidth + i];
 			break;
 			default:
 				printf("Error wrong font number set must be 1-4\n");
@@ -863,7 +865,7 @@ void TFTdrawText(uint8_t x, uint8_t y, char *ptext, uint16_t color, uint16_t bg,
 			cursor_x = 0;
 			cursor_y = cursor_y + size * 7 + 3;
 			if (cursor_y > _height_TFT) cursor_y = _height_TFT;
-			if (ptext[i] == TFT_ASCII_OFFSET) goto _skip;
+			if (ptext[i] == _CurrentFontoffset ) goto _skip;
 		}
 		TFTdrawChar(cursor_x, cursor_y, ptext[i], color, bg, size);
 		cursor_x = cursor_x + size * (_CurrentFontWidth + 1);
@@ -1000,32 +1002,70 @@ void pushColor(uint16_t color) {
 
 
 // Desc :  Set the font number
-// Param1: fontnumber 1-5
-// 1=default 2=thick 3=seven segment 4=wide 5=bignums
-// Fonts must be enabled at top of header file.
+// Param1: fontnumber 1-6
+// 1=default 2=thick 3=seven segment 4=wide 5=bignums 6=mednums
 
 void TFTFontNum(uint8_t FontNumber) {
-
-	enum TFT_Font_width_TFT {
-		BLANK = 0, FONT_W_FIVE = 5, FONT_W_SEVEN = 7, FONT_W_FOUR = 4, FONT_W_EIGHT = 8, FONT_W_16 = 16
-	};
-	enum TFT_Font_width_TFT setfontwidth;
+	
 	_FontNumber = FontNumber;
+	
+	enum OLED_Font_width
+	{
+		FONT_W_FIVE = 5, FONT_W_SEVEN = 7, FONT_W_FOUR = 4, FONT_W_EIGHT = 8,FONT_W_16= 16
+	}; // width of the font in bytes cols.
+	
+	enum OLED_Font_offset
+	{
+		FONT_O_EXTEND = TFT_ASCII_OFFSET, FONT_O_SP = TFT_ASCII_OFFSET_SP, FONT_N_SP = TFT_ASCII_OFFSET_NUM
+	}; // font offset in the ASCII table
+	
+	enum OLED_Font_height
+	{
+		FONT_H_8 = 8, FONT_H_16 = 16, FONT_H_32 = 32
+	}; // width of the font in bits
+	
+	enum OLED_Font_width setfontwidth;
+	enum OLED_Font_offset setoffset;
+	enum OLED_Font_height setfontheight;
 
 	switch (_FontNumber) 
 	{
-		case 1: _CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
-			break; // Norm default 5 by 8
-		case 2: _CurrentFontWidth = (setfontwidth = FONT_W_SEVEN);
-			break; //Thick 7 by 8 (NO LOWERCASE LETTERS)
-		case 3: _CurrentFontWidth = (setfontwidth = FONT_W_FOUR);
-			break; //Seven segment 4 by 8
-		case 4: _CurrentFontWidth = (setfontwidth = FONT_W_EIGHT);
-			break; // Wide  8 by 8 (NO LOWERCASE LETTERS)
-		case 5: _CurrentFontWidth = (setfontwidth = FONT_W_16);
-			break; // bignums 16 by 32 (NUMBERS ONLY)
+		case 1:  // Norm default 5 by 8
+			_CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break; 
+		case 2: // Thick 7 by 8 (NO LOWERCASE LETTERS)
+			_CurrentFontWidth = (setfontwidth = FONT_W_SEVEN);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break; 
+		case 3:  // Seven segment 4 by 8
+			_CurrentFontWidth = (setfontwidth = FONT_W_FOUR);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break;
+		case 4: // Wide  8 by 8 (NO LOWERCASE LETTERS)
+			_CurrentFontWidth = (setfontwidth = FONT_W_EIGHT);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+		break; 
+		case 5: // big nums 16 by 32 (NUMBERS + : only)
+			_CurrentFontWidth = (setfontwidth = FONT_W_16);
+			_CurrentFontoffset =  (setoffset = FONT_N_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_32);
+		break; 
+		case 6: // med nums 16 by 16 (NUMBERS + : . only)
+			_CurrentFontWidth = (setfontwidth = FONT_W_16);
+			_CurrentFontoffset =  (setoffset = FONT_N_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_16);
+		break; 
 		default:
-			printf("Error : Wrong font number Set must be 1-5\n");
+			printf("Error: Wrong font number ,must be 1-6\n");
+			_CurrentFontWidth = (setfontwidth = FONT_W_FIVE);
+			_CurrentFontoffset =  (setoffset = FONT_O_SP);
+			_CurrentFontheight = (setfontheight=FONT_H_8);
+			_FontNumber = 1;
 		break;
 	}
 }
@@ -1175,30 +1215,42 @@ void TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h) {
 // Param 3: The ASCII character
 // Param 4: color 565 16-bit
 // Param 5: background color
-// Notes for font 5 bignums only , font must be included in header file
+// Notes for font 5,6 only 
 
-void TFTdrawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg) 
+void TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg) 
 {
-	if (_FontNumber != 5) 
+	if (_FontNumber < 5)
 	{
-		printf("Error : Wrong font number Set must be 5\n");
+		printf("Error: Wrong font selected, must be 5 or 6 \n");
 		return;
 	}
+	
 	uint8_t i, j;
 	uint8_t ctemp = 0, y0 = y; 
 
-	for (i = 0; i < 64; i++) {
-		ctemp = Font_Five[c - TFT_ASCII_OFFSET_NUM][i];
-		for (j = 0; j < 8; j++) {
-			if (ctemp & 0x80) {
+	for (i = 0; i < _CurrentFontheight*2; i++) 
+	{
+		if (_FontNumber == 5){
+			ctemp = Font_Five[c - _CurrentFontoffset][i];
+		}
+		else if (_FontNumber == 6){
+			ctemp = Font_Six[c - _CurrentFontoffset][i];
+		}
+		
+		for (j = 0; j < 8; j++) 
+		{
+			if (ctemp & 0x80) 
+			{
 				TFTdrawPixel(x, y, color);
-			} else {
+			} else 
+			{
 				TFTdrawPixel(x, y, bg);
 			}
 
 			ctemp <<= 1;
 			y++;
-			if ((y - y0) == 32) {
+			if ((y - y0) == _CurrentFontheight) 
+			{
 				y = y0;
 				x++;
 				break;
@@ -1212,29 +1264,28 @@ void TFTdrawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_
 // Param 3: pointer to string 
 // Param 4: color 565 16-bit
 // Param 5: background color
-// Notes for font 5 only "bignums" 
+// Notes for font 5 6 only 
 
-void TFTdrawTextBigNum(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg) 
+void TFTdrawTextNumFont(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg) 
 {
-	if (_FontNumber != 5) 
+	if (_FontNumber < 5)
 	{
-		printf("Error : Wrong font number Set must be 5\n");
+		printf("Error: Wrong font selected, must be 5 or 6 \n");
 		return;
 	}
-	const uint8_t charSizeY = 32;
+	
 	while (*pText != '\0') 
 	{
 		if (x > (_width_TFT - _CurrentFontWidth )) 
 		{
 			x = 0;
-			y += charSizeY ;
-			if (y > (_height_TFT - charSizeY )) 
+			y += _CurrentFontheight;
+			if (y > (_height_TFT - _CurrentFontheight )) 
 			{
 				y = x = 0;
 			}
 		}
-		
-		TFTdrawCharBigNum(x, y, *pText, color, bg);
+		TFTdrawCharNumFont(x, y, *pText, color, bg);
 		x += _CurrentFontWidth ;
 		pText++;
 	}

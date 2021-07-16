@@ -46,14 +46,14 @@ Installation
 	* Run following command to download from github.
 
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.1.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.2.tar.gz | tar xz
 ```
 
 4. Run "make" to run the makefile to install library, it will be
     installed to usr/lib and usr/include
 
 ```sh
-cd ST7735_TFT_RPI-1.1
+cd ST7735_TFT_RPI-1.2
 sudo make
 ```
 
@@ -69,8 +69,16 @@ make
 sudo bin/test
 ```
 
+
 Features
 ----------------------
+
+There are three sections in header file where user can make adjustments
+to select for SPI type used, PCB type used and screen size.
+
+1. USER OPTION 1 PCB_TYPE 
+2. USER OPTION 2 SPI TYPE
+3. USER OPTION 3 SCREEN SECTION 
 
 **TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels**
 
@@ -79,11 +87,16 @@ It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.
 the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1.
 Backlight control is left to user.
 
+**Screen size Offsets**
+
+In the header file, in USER OPTION 3 SCREEN SECTION 
+User can adjust screen pixel height, screen pixel width and x&y screen offsets
+
 **PCB Version**
 
-It should work on other TFT displays using the different init functions, but not tested.
-In the header file in USER OPTION PCB_TYPE select your PCB.
-default is "red tab". User can adjust pixel height, pixel width and screen offsets in the header file.
+It should work in theory on other TFT displays using the different init functions, 
+but not tested.
+In the header file in USER OPTION 1 PCB_TYPE select your PCB. default is "red tab". 
 
 There are 4 types of the ST7735 TFT display supported.
 
@@ -96,7 +109,7 @@ There are 4 types of the ST7735 TFT display supported.
 
 This library supports both Hardware SPI and software SPI.
 Change the define a top of header file
-to switch between the two. USER OPTION SPI TYPE.
+to switch between the two. USER OPTION 2 SPI TYPE.
 Uses bcm2835 library.
 Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
 SPI settings can be viewed/changed in TFT_SPI_Initialize function.
@@ -119,15 +132,19 @@ There are two makefiles
 
 **Fonts**
 
-Five fonts available :
+Six fonts available : 
 
-| Font num | Font name | Pixel size |  Note |
-| ------ | ------ | ------ | ------ |
-| 1 | Default | 5x8 |   ------ |
-| 2 | Thick   | 7x8 |  no lowercase letters  |
-| 3 | Seven segment | 4x8 | ------ |
-| 4 | Wide | 8x8 | no lowercase letters |
-| 5 | BigNums | 16x32 |  Numbers only , Cannot be scaled |
+| Font num | Font name | Font size xbyy |  Note |
+| ------ | ------ | ------ | ------ |  
+| 1 | Default | 5x8 | Full Extended ASCII 0x00 - 0xFF |
+| 2 | Thick   | 7x8 | ASCII  0x20 - 0x5A  ,no lowercase letters |
+| 3 | Seven segment | 4x8 | ASCII  0x20 - 0x7A |
+| 4 | Wide | 8x8 | ASCII 0x20 - 0x5A , no lowercase letters |
+| 5 | Big Nums | 16x32 | ASCII 0x2E-0x3A , Numbers + : . only |
+| 6 | Med Nums | 16x16 | ASCII 0x2E-0x3A , Numbers + : . only |
+
+The fonts 1-4 are byte high(at text size 1) scale-able fonts,
+The large numerical Fonts 5 & 6 cannot be scaled.
 
 **Bitmap**
 

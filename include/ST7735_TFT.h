@@ -129,14 +129,20 @@
 
 // Offsets + screen size + Misc
 #define TFT_HIGHFREQ_DELAY 0 //Software SPI delay
-#define TFT_ASCII_OFFSET 0x20 //ASCII character for Space, The font table(1-4) starts here
-#define TFT_ASCII_OFFSET_NUM 0x30 //offset for bignum font
-#define OFFSET_COL 2  // These offsets can be adjusted for any issues
-#define OFFSET_ROW 3  // with manufacture tolerance/defects
+#define TFT_ASCII_OFFSET 0x00
+#define TFT_ASCII_OFFSET_SP 0x20 //ASCII character for Space, The font table(1-4) starts here
+#define TFT_ASCII_OFFSET_NUM 0x2E //offset for  font 5-6
 #define _swap(a, b) { int16_t t; t = a; a = b; b = t;}
-#define _width_TFT 128
-#define _height_TFT 128
+// ***  USER OPTION 3 SCREEN SECTION ***
+#define OFFSET_COL 2  // 0 These offsets can be adjusted for any issues
+#define OFFSET_ROW 3  // 0 with manufacture tolerance/defects
+#define _width_TFT 128 // Screen width in pixels
+#define _height_TFT 128 // Screen height in pixels
+// **********************************************
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum ST7735_modes {
     NORMAL = 0, PARTIAL, IDLE, SLEEP, INVERT, DISP_ON, DISP_OFF
@@ -211,8 +217,8 @@ void TFTsetTextWrap(bool w);
 void TFTFontNum(uint8_t FontNumber);
 void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
 void TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t bg, uint8_t size);
-void TFTdrawCharBigNum(uint8_t x, uint8_t y, uint8_t c, uint16_t color ,uint16_t bg);
-void TFTdrawTextBigNum(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg);
+void TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint16_t color ,uint16_t bg);
+void TFTdrawTextNumFont(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg);
 
 // Bitmap & Icon
 void TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
@@ -221,6 +227,10 @@ void TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h);
 void TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h);
 void pushColor(uint16_t color);
 int16_t Color565(int16_t ,int16_t , int16_t );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // file header guard
 

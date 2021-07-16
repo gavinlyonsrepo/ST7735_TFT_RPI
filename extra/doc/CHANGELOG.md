@@ -4,3 +4,5 @@
 	* first release.
 * Version 1.1 June 2021
 	* packaged library files as a dynamic C++ install-able system level library.
+* Version 1.1 July 2021
+	* Added font 6. 

@@ -35,10 +35,11 @@
 // ************ Function Headers ****************
 void Setup(void);
 
-void Test0(void);  // Print out all five fonts, fonts must be enabled in header file for this to work
+void Test0(void);  // Print out all fonts 1-4
 void Test1A(void); // defined 16-bit Colors, text
 void Test1B(void); // print entire ASCII font 32 to 127
 void Test1C(void); // print numbers int and float
+void Test1D(void); // Print out font 5 & 6 
 void Test2(void);  // font sizes(1-4)+ character draw
 void Test3(void);  // pixels and lines
 void Test4(void);  // rectangles 
@@ -48,7 +49,7 @@ void Test7(void);  // scroll
 void Test8(void);  // More shapes, media buttons graphic.
 void Test9(void);  // Rotate
 void Test10(void); // change modes test // Invert, display on/off and Sleep.
-void Test11(void); // icons, small bi-color bitmaps, BigNum font (5)
+void Test11(void); // "clock demo" icons, small bi-color bitmaps, font 5 & 6
 void Test12(void); // two color bitmap
 void Test14(void); // 24 color bitmap
 void Test15(void); // 16 color bitmap 
@@ -69,9 +70,11 @@ int main(void)
 	while (1) 
 	{
 		Test0();
+		
 		Test1A();
 		Test1B();
 		Test1C();
+		Test1D();
 		Test2();
 		Test3();
 		Test4();
@@ -159,14 +162,14 @@ void Test1A(void) {
 	TFTdrawText(0, 85, "GREY", ST7735_GREY, ST7735_BLACK, 1);
 	TFTdrawText(0, 95, "TAN", ST7735_TAN, ST7735_BLACK, 1);
 	TFTdrawText(0, 105, "BROWN", ST7735_BROWN, ST7735_BLACK, 1);
-	bcm2835_delay(TEST_DELAY2);
+	bcm2835_delay(TEST_DELAY5);
 	TFTfillScreen(ST7735_BLACK);
 }
 
 void Test1B(void) {
 	uint8_t row = 5;
 	uint8_t col = 0;
-	for (char i = TFT_ASCII_OFFSET; i < 126; i++) {
+	for (char i = TFT_ASCII_OFFSET_SP; i < 126; i++) {
 		TFTdrawChar(col, row, i, ST7735_GREEN, ST7735_BLACK, 1);
 		col += 10;
 		if (col > 100) {
@@ -183,23 +186,40 @@ void Test1B(void) {
 
 void Test1C(void)
 {
-		int myInt=931;
-		char myStr[5];
-		TFTFontNum(3);
-		sprintf(myStr, "%d", myInt);
-		TFTdrawText(5, 5, myStr, ST7735_BLUE, ST7735_BLACK, 3);
+	int myInt=931;
+	char myStr[5];
+	TFTFontNum(3);
+	sprintf(myStr, "%d", myInt);
+	TFTdrawText(5, 5, myStr, ST7735_BLUE, ST7735_BLACK, 3);
 
-		float  myPI = 3.141592;
-		char myStr2[8];
-		sprintf(myStr2, "%0.2f", myPI);
-		TFTdrawText(5, 65, myStr2, ST7735_RED, ST7735_BLACK, 3);
+	float  myPI = 3.141592;
+	char myStr2[8];
+	sprintf(myStr2, "%0.2f", myPI);
+	TFTdrawText(5, 65, myStr2, ST7735_RED, ST7735_BLACK, 3);
+	
+	bcm2835_delay(TEST_DELAY2);
+	TFTfillScreen(ST7735_BLACK);
 		
-		bcm2835_delay(TEST_DELAY2);
-		TFTfillScreen(ST7735_BLACK);
-		TFTFontNum(1);
+}
+
+void Test1D(void)
+{
+	// Note fonts 5 and 6 are numbers only + : and . also / gives a space
+	
+	TFTFontNum(5);
+	TFTdrawCharNumFont(0, 0, '5',  ST7735_RED, ST7735_BLACK);
+	TFTdrawTextNumFont(0, 40, "9.4/3:81", ST7735_YELLOW, ST7735_RED);
+	
+	TFTFontNum(6);
+	TFTdrawCharNumFont(0, 75, '6',  ST7735_WHITE, ST7735_BLACK);
+	TFTdrawTextNumFont(0, 100, "7.2/2:83", ST7735_GREEN, ST7735_RED);
+	
+	bcm2835_delay(TEST_DELAY5);
+	TFTfillScreen(ST7735_BLACK);
 }
 
 void Test2(void) {
+	TFTFontNum(1);
 	char *txttwo = "TEST";
 	TFTdrawText(0, 5, txttwo, ST7735_WHITE, ST7735_BLACK, 2);
 	TFTdrawText(0, 25, txttwo, ST7735_WHITE, ST7735_BLACK, 3);
@@ -365,15 +385,15 @@ void Test11(void)
 		count--; 
 		sprintf(myStr, "%03d", count);
 		
-		TFTdrawCharBigNum(0, 45, value[timenow->tm_hour / 10],ST7735_RED, ST7735_BLACK);
-		TFTdrawCharBigNum(16, 45, value[timenow->tm_hour % 10],ST7735_RED, ST7735_BLACK);
-		TFTdrawCharBigNum(32, 45, ':' , ST7735_GREEN, ST7735_BLACK);
-		TFTdrawCharBigNum(48, 45, value[timenow->tm_min / 10], ST7735_RED, ST7735_BLACK);
-		TFTdrawCharBigNum(64, 45, value[timenow->tm_min % 10], ST7735_RED, ST7735_BLACK);
-		TFTdrawCharBigNum(80, 45, ':' , ST7735_GREEN, ST7735_BLACK);
-		TFTdrawCharBigNum(96, 45, value[timenow->tm_sec / 10],  ST7735_RED, ST7735_BLACK);
-		TFTdrawCharBigNum(112, 45, value[timenow->tm_sec % 10],  ST7735_RED, ST7735_BLACK);
-		TFTdrawTextBigNum(0, 85, myStr, ST7735_YELLOW, ST7735_RED);
+		TFTdrawCharNumFont(0, 45, value[timenow->tm_hour / 10],ST7735_RED, ST7735_BLACK);
+		TFTdrawCharNumFont(16, 45, value[timenow->tm_hour % 10],ST7735_RED, ST7735_BLACK);
+		TFTdrawCharNumFont(32, 45, ':' , ST7735_GREEN, ST7735_BLACK);
+		TFTdrawCharNumFont(48, 45, value[timenow->tm_min / 10], ST7735_RED, ST7735_BLACK);
+		TFTdrawCharNumFont(64, 45, value[timenow->tm_min % 10], ST7735_RED, ST7735_BLACK);
+		TFTdrawCharNumFont(80, 45, ':' , ST7735_GREEN, ST7735_BLACK);
+		TFTdrawCharNumFont(96, 45, value[timenow->tm_sec / 10],  ST7735_RED, ST7735_BLACK);
+		TFTdrawCharNumFont(112, 45, value[timenow->tm_sec % 10],  ST7735_RED, ST7735_BLACK);
+		TFTdrawTextNumFont(0, 85, myStr, ST7735_YELLOW, ST7735_RED);
 		
 		if(count==1)break;
 	}
