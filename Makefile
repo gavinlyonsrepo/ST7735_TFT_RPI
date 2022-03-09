@@ -20,10 +20,10 @@ LIBNAME=$(LIB).so.1.0
 MD=mkdir
 SRC=src
 OBJ=obj
-SRCS = $(wildcard $(SRC)/*.c)
-OBJS = $(patsubst $(SRC)%.c,  $(OBJ)/%.o, $(SRCS))
+SRCS = $(wildcard $(SRC)/*.cpp)
+OBJS = $(patsubst $(SRC)%.cpp,  $(OBJ)/%.o, $(SRCS))
 
-CC=gcc
+CC=g++
 CFLAGS= -Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s -Iinclude/
 LDFLAGS= -lbcm2835
 
@@ -43,7 +43,7 @@ ST7735_TFT_RPI: $(OBJS)
 	$(CC) -shared -Wl,-soname,$(LIB).so.1 $(CFLAGS) $(LDFLAGS)  -o ${LIBNAME} $^
 
 # Library parts
-$(OBJ)/%.o: $(SRC)/%.c
+$(OBJ)/%.o: $(SRC)/%.cpp
 	$(CC) -Wall -fPIC -c $(CFLAGS) $< -o $@
 
 # Install the library to LIBPATH
@@ -62,7 +62,9 @@ install:
 	@echo "[INSTALL HEADERS]"
 	@if ( test ! -d $(PREFIX)/include ) ; then mkdir -p $(PREFIX)/include ; fi
 	@cp -vf  include/ST7735_TFT.h $(PREFIX)/include
+	@cp -vf  include/ST7735_TFT_graphics.h $(PREFIX)/include
 	@cp -vf  include/ST7735_TFT_Font.h $(PREFIX)/include
+	@cp -vf  include/ST7735_TFT_Print.h $(PREFIX)/include
 	@echo "[DONE!]"
 
 # Uninstall the library
@@ -73,7 +75,9 @@ uninstall:
 
 	@echo "[UNINSTALL HEADERS]"
 	@rm -rvf  $(PREFIX)/include/ST7735_TFT.h
+	@rm -rvf  $(PREFIX)/include/ST7735_TFT_graphics.h
 	@rm -rvf  $(PREFIX)/include/ST7735_TFT_Font.h
+	@rm -rvf  $(PREFIX)/include/ST7735_TFT_Print.h
 	@echo "[DONE!]"
 
 # clear build files

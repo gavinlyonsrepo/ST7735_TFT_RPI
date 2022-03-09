@@ -5,7 +5,8 @@ Table of contents
 
   * [Overview](#overview)
   * [Installation](#installation)
-  * [Features](#features)  
+  * [Test](#test)
+  * [Software](#software)  
   * [Hardware](#hardware)
   * [Output](#output)
 
@@ -14,10 +15,10 @@ Overview
 * Name: ST7735_TFT_RPI
 * Description:
 
-0. C Library for TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
-1. Dynamic install-able Raspberry Pi C library.
+0. C++ Library for TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
+1. Dynamic install-able Raspberry Pi C++ library.
 2. Inverse colour, rotate, sleep, idle mode & verticaly scroll methods supported.
-3. Five fonts
+3. Seven fonts
 4. Graphics class included.
 5. 24 bit colour , 16 bit color & bi-color Bitmaps supported.
 6. Hardware and Software SPI
@@ -27,9 +28,9 @@ Overview
 * Port of my PIC library at [github link.](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 * Created: May 2021
 * Developed on
-    1. Raspberry PI 3 model b,
-    2. C complier gcc (Raspbian 6.3.0-18)
-    3. Raspbian 9.13 stretch OS
+    1. Raspberry PI 3 model b
+    2. C++ g++ (Raspbian 8.3.0-6+rpi1) 8.3.0
+    3. Raspbian 10 stretch OS , armv7l Linux 5.10.63-v7
     4. bcm2835 Library 1.68
 
 Installation
@@ -46,18 +47,21 @@ Installation
 	* Run following command to download from github.
 
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.2.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.3.tar.gz | tar xz
 ```
 
 4. Run "make" to run the makefile to install library, it will be
     installed to usr/lib and usr/include
 
 ```sh
-cd ST7735_TFT_RPI-1.2
+cd ST7735_TFT_RPI-1.3
 sudo make
 ```
 
-5. Next step is to test TFT and installed library with the main.c test file.
+Test
+----------------------------
+
+1. Next step is to test TFT and installed library with the main.cpp test file.
 Wire up your TFT. Next enter the example folder and run the makefile in THAT folder,
 This second makefile builds the examples file using the just installed library.
 and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/)
@@ -70,15 +74,49 @@ sudo bin/test
 ```
 
 
-Features
+Software
 ----------------------
 
-There are three sections in header file where user can make adjustments
-to select for SPI type used, PCB type used and screen size.
+In example/src/main.cpp file. There are three sections in "Setup()" function 
+where user can make adjustmentsto select for SPI type used, PCB type used and screen size.
 
-1. USER OPTION 1 PCB_TYPE 
-2. USER OPTION 2 SPI TYPE
-3. USER OPTION 3 SCREEN SECTION 
+1. USER OPTION 1 SPI/GPIO TYPE
+2. USER OPTION 2 SCREEN SECTION 
+3. USER OPTION 3 PCB_TYPE
+
+**SPI**
+
+This library supports both Hardware SPI and software SPI.
+The parameters set for TFTSetupGPIO define which is used by default its Hardware.
+to switch between the two see notes in example/src/main.cpp file.(USER OPTION 1)
+SPI Uses bcm2835 library.
+Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
+SPI settings can be viewed/changed in TFT_SPI_Initialize function,
+If you change them you will have to reinstall library.
+
+**Screen size  + Offsets**
+
+In the main.cpp file, in USER OPTION 2 .
+User can adjust screen pixel height, screen pixel width and x & y screen offsets.
+These offsets can be used in the event of screen damage or manufacturing errors around edge 
+such as cropped data or defective pixels.
+The function TFTInitScreenSize sets them.
+
+**PCB Version**
+
+It should work in theory on other TFT displays using the different init functions, 
+but not tested. In the main.cpp in USER OPTION 3 PCB_TYPE select your PCB.
+By passing an enum type to function  TFTInitPCBType.
+Default is "TFT_ST7735R_Red". 
+
+There are 4 types of the ST7735 TFT display supported.
+| Number | Description | Enum label|
+| ---- | ---- | --- | 
+| 1 | ST7735B controller| TFT_ST7735B |
+| 2 | ST7735R Green Tab | TFT_ST7735R_Green |
+| 3 | ST7735R Red Tab | | TFT_ST7735R_Red |
+| 4 | ST7735S Black Tab | TFT_ST7735S_Black |
+
 
 **TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels**
 
@@ -87,52 +125,23 @@ It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.
 the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1.
 Backlight control is left to user.
 
-**Screen size Offsets**
-
-In the header file, in USER OPTION 3 SCREEN SECTION 
-User can adjust screen pixel height, screen pixel width and x&y screen offsets
-
-**PCB Version**
-
-It should work in theory on other TFT displays using the different init functions, 
-but not tested.
-In the header file in USER OPTION 1 PCB_TYPE select your PCB. default is "red tab". 
-
-There are 4 types of the ST7735 TFT display supported.
-
-1. ST7735B controller
-2. ST7735R Green Tab
-3. ST7735R Red Tab
-4. ST7735S Black Tab
-
-**SPI**
-
-This library supports both Hardware SPI and software SPI.
-Change the define a top of header file
-to switch between the two. USER OPTION 2 SPI TYPE.
-Uses bcm2835 library.
-Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
-SPI settings can be viewed/changed in TFT_SPI_Initialize function.
 
 **Files**
 
-There is a TFT library (ST7735_TFT.c and ST7735_TFT.h),
-and a fonts file that contains ASCII pixel fonts.
-
 In example folder:
-The Main.c file contains tests showing library functions.
+The Main.cpp file contains tests showing library functions.
 A bitmap data file contains data for bi-color bitmaps and icons tests.
 The color bitmaps used in testing are in bitmap folder, 3 16-bit and 3 24-bit images.
 
 There are two makefiles
 
-    1. Makefile at root directory builds and installs library at a system level.
-    2. Makefile in example directory build example file to an executable.
+    1. At root directory builds and installs library at a system level.
+    2. Example directory builds example file + installed library to an executable.
 
 
 **Fonts**
 
-Six fonts available : 
+Seven fonts available : 
 
 | Font num | Font name | Font size xbyy |  Note |
 | ------ | ------ | ------ | ------ |  
@@ -140,10 +149,11 @@ Six fonts available :
 | 2 | Thick   | 7x8 | ASCII  0x20 - 0x5A  ,no lowercase letters |
 | 3 | Seven segment | 4x8 | ASCII  0x20 - 0x7A |
 | 4 | Wide | 8x8 | ASCII 0x20 - 0x5A , no lowercase letters |
-| 5 | Big Nums | 16x32 | ASCII 0x2E-0x3A , Numbers + : . only |
-| 6 | Med Nums | 16x16 | ASCII 0x2E-0x3A , Numbers + : . only |
+| 3 | Tiny | 3x8 | ASCII  0x20 - 0x7A |
+| 6 | Big Nums | 16x32 | ASCII 0x2E-0x3A , Numbers + : . only |
+| 7 | Med Nums | 16x16 | ASCII 0x2E-0x3A , Numbers + : . only |
 
-The fonts 1-4 are byte high(at text size 1) scale-able fonts,
+The fonts 1-5 are byte high(at text size 1) scale-able fonts,
 The large numerical Fonts 5 & 6 cannot be scaled.
 
 **Bitmap**
@@ -155,17 +165,17 @@ in this library.
 
 | Function Name | Colour support | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |
-| drawIcon | bi-colour | 8 x(0-127) , 128 bytes max  | Data vertically addressed |
-| drawBitmap | bi-colour | 128 by 128 , 2048 bytes max | Data horizontally  addressed |
-| drawBitmap16 | 16 bit color 565 BMP files | 128 by 128 = 32K max | ------ |
-| drawBitmap24  | 24 bit color BMP files | 128 by 128 = 48K max | Converted by software to 16-bit color  |
+| TFTdrawIcon | bi-colour | 8 x(0-127) , 128 bytes max  | Data vertically addressed |
+| TFTdrawBitmap | bi-colour | 128 by 128 , 2048 bytes max | Data horizontally  addressed |
+| TFTdrawBitmap16 | 16 bit color 565 BMP files | 128 by 128 = 32K max | ------ |
+| TFTdrawBitmap24  | 24 bit color BMP files | 128 by 128 = 48K max | Converted by software to 16-bit color  |
 
 Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
 
 Hardware
 ----------------------
 
-Connections as setup in main.c test file.
+Connections as setup in main.cpp test file.
 
 | TFT PinNum | Pindesc | RPI SW SPI | RPI HW SPI |
 | --- | --- | --- | --- |
@@ -192,11 +202,11 @@ Output of some of the test routine's. Left to right, top to bottom.
 
 1. Different defined colors at default font size 1. Full 16 bit colour 565 available
 2. Different sizes of default font. Size 2 3 4 & 5 shown.
-3. Different Fonts at font size 2, fonts 1-4. Are these fonts are scale-able
+3. Different Fonts at font size 2, fonts 1-5. Are these fonts are scale-able
 4. Shapes
-5. Shapes
+5. More Shapes
 6. Bitmap (bi-color) A background and a foreground.
-7. Clock Demo showing icons, small bitmaps and font 5 "BigNums"
+7. Clock Demo showing icons, small bitmaps and font 6 "BigNums"
 8. 24-bit color bitmap test image
 9. 16-bit color bitmap test image
 

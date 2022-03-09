@@ -3,7 +3,6 @@
  * File: ST7735_TFT.h
  * Description: library header file
  * Author: Gavin Lyons.
- * Created May 2021
  * Description: See URL for full details.
  * URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
  */
@@ -11,30 +10,18 @@
 #ifndef _st7735_tft_lcd_h
 #define _st7735_tft_lcd_h
 
+// Section Libraries 
 #include <bcm2835.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include "ST7735_TFT_graphics.h" // Custom
 
-#include "ST7735_TFT_Font.h"
 
-// ******** USER OPTION 1 PCB_TYPE *********
-// PCB type , pick one and one ONLY
-#define TFT_PCB_RED
-//#define TFT_PCB_GREEN
-//#define TFT_PCB_BLACK
-//#define  TFT_PCB_GENERIC
-// ****************************************
+// Section:  Defines
 
-// ******** USER OPTION 2 SPI TYPE ***********
-// SPI TFT module connections
-// *** If software SPI module is used, comment this line OUT ***
-#define TFT_SPI_HARDWARE
-// *******************************************
-
-// *********** DEFINES ****************
-// ******** ST7735 registers ********
+// ST7735 registers 
 #define ST7735_NOP     0x00 // Non operation
 #define ST7735_SWRESET 0x01 // Soft Reset
 #define ST7735_RDDID   0x04
@@ -49,8 +36,8 @@
 #define ST7735_DISPOFF 0x28 // Display off
 #define ST7735_DISPON  0x29 // Display on
 
-#define ST7735_IDLEON 0x39 //Idle Mode ON
-#define ST7735_IDLEOF  0x38 //Idle Mode OFF
+#define ST7735_TFT_Idle_modeON 0x39 //Idle Mode ON
+#define ST7735_TFT_Idle_modeOF  0x38 //Idle Mode OFF
 
 #define ST7735_CASET   0x2A // Column address set
 #define ST7735_RASET   0x2B // Page address set
@@ -127,110 +114,75 @@
 #define TFT_SDATA_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SDATA, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_CS_SetDigitalOutput bcm2835_gpio_fsel(_TFT_CS, BCM2835_GPIO_FSEL_OUTP)
 
-// Offsets + screen size + Misc
 #define TFT_HIGHFREQ_DELAY 0 //Software SPI delay
-#define TFT_ASCII_OFFSET 0x00
-#define TFT_ASCII_OFFSET_SP 0x20 //ASCII character for Space, The font table(1-4) starts here
-#define TFT_ASCII_OFFSET_NUM 0x2E //offset for  font 5-6
-#define _swap(a, b) { int16_t t; t = a; a = b; b = t;}
-// ***  USER OPTION 3 SCREEN SECTION ***
-#define OFFSET_COL 2  // 0 These offsets can be adjusted for any issues
-#define OFFSET_ROW 3  // 0 with manufacture tolerance/defects
-#define _width_TFT 128 // Screen width in pixels
-#define _height_TFT 128 // Screen height in pixels
-// **********************************************
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-enum ST7735_modes {
-    NORMAL = 0, PARTIAL, IDLE, SLEEP, INVERT, DISP_ON, DISP_OFF
-}; //0,1,2,3,4,5,6
+// Section: Enums
 
-// ******** FUNCTION  PROTOTYPES ************
+typedef enum  {
+	TFT_Normal_mode = 0, 
+	TFT_Partial_mode, 
+	TFT_Idle_mode, 
+	TFT_Sleep_mode, 
+	TFT_Invert_mode, 
+	TFT_Display_on_mode, 
+	TFT_Display_off_mode
+}TFT_modes_e; // TFT display modes
 
-// SPI
-void spiwrite(uint8_t);
-void write_command(uint8_t);
-void write_data(uint8_t);
-void TFT_SPI_Initialize(void);
-void TFT_SPIoff(void);
-void TFT_PowerDown(void);
+typedef enum  {
+	TFT_Degress_0 = 0, TFT_Degress_90, TFT_Degress_180, TFT_Degress_270
+}TFT_rotate_e; // TFT rotate modes in degrees 
 
-// Init routines
-void TFT_Setup(int8_t, int8_t, int8_t, int8_t, int8_t);
-void TFT_ResetPIN(void);
-void Rcmd1(void);
-void Rcmd2red(void);
-void Rcmd3(void);
+typedef enum {
+	TFT_ST7735R_Red = 0, // ST7735R Red Tab 
+	TFT_ST7735R_Green, // ST7735R Green Tab
+	TFT_ST7735S_Black, // ST7735S Black Tab
+	TFT_ST7735B, // ST7735B controller
+}TFT_PCBtype_e; // type of PCB
 
-#ifdef TFT_PCB_GENERIC
-void TFT_ST7735B_Initialize(void);
-void Bcmd();
-#endif
+// Section: class's
 
-#ifdef TFT_PCB_GREEN
-void TFT_GreenTab_Initialize(void);
-void Rcmd2green();
-#endif
+// Class to control ST7735 TFT basic functionality.
+ 
+class ST7735_TFT : public ST7735_TFT_graphics
+{
 
-#ifdef TFT_PCB_BLACK
-void TFT_BlackTab_Initialize(void);
-#endif
+public:
 
-#ifdef TFT_PCB_RED
-void TFT_RedTab_Initialize(void);
-#endif
+	ST7735_TFT();
+	~ST7735_TFT(){};
+	
+	TFT_modes_e TFT_mode;
+	TFT_rotate_e TFT_rotate;
+	TFT_PCBtype_e TFT_PCBtype;
+	
+	void TFTSetupGPIO(int8_t, int8_t, int8_t, int8_t, int8_t);
+	void TFTInitScreenSize(uint8_t xOffset, uint8_t yOffset, uint16_t w, uint16_t h);
+	void TFTInitPCBType(TFT_PCBtype_e);
+	void TFTPowerDown(void);
+	
+	void TFTsetRotation(TFT_rotate_e r);
+	void TFTchangeMode(TFT_modes_e m);
+	void TFTsetScrollDefinition(uint8_t th, uint8_t tb, bool sd);
+	void TFTVerticalScroll(uint8_t vsp);
+	
+private:
 
-// Misc + Screen related
-void TFTfillScreen(uint16_t color);
-void TFTsetRotation(uint8_t);
-void TFTchangeMode(const enum ST7735_modes m);
-void setAddrWindow(uint8_t, uint8_t, uint8_t, uint8_t);
-void setScrollDefinition(uint8_t top_fix_height_TFT, uint8_t bottom_fix_height_TFT, bool _scroll_direction);
-void VerticalScroll(uint8_t _vsp);
+	void TFTResetPIN(void);
+	void TFTSPIInitialize(void);
+	void TFTST7735BInitialize(void);
+	void TFTGreenTabInitialize(void);
+	void TFTBlackTabInitialize(void);
+	void TFTRedTabInitialize(void);
+	void Rcmd1(void);
+	void Rcmd2red(void);
+	void Rcmd3(void);
+	void Bcmd(void);
+	void Rcmd2green(void);
+	
+	uint8_t  _rotation = 0; 
 
-// Shapes and lines
-void TFTdrawPixel(uint8_t, uint8_t, uint16_t);
-void TFTdrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-void TFTdrawFastVLine(uint8_t x, uint8_t y, uint8_t h, uint16_t color);
-void TFTdrawFastHLine(uint8_t x, uint8_t y, uint8_t w, uint16_t color);
-
-void drawRectWH(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
-void fillRectangle(uint8_t, uint8_t, uint8_t, uint8_t, uint16_t);
-void fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color);
-
-void drawRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color);
-void fillRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color);
-
-void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-void drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
-void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color);
-void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-
-void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-
-// Text
-void TFTsetTextWrap(bool w);
-void TFTFontNum(uint8_t FontNumber);
-void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
-void TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t bg, uint8_t size);
-void TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint16_t color ,uint16_t bg);
-void TFTdrawTextNumFont(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg);
-
-// Bitmap & Icon
-void TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
-void TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const unsigned char bitmap[]);
-void TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h);
-void TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h);
-void pushColor(uint16_t color);
-int16_t Color565(int16_t ,int16_t , int16_t );
-
-#ifdef __cplusplus
-}
-#endif
+}; //end of class
 
 #endif // file header guard
 
