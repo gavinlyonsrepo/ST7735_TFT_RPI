@@ -63,7 +63,7 @@ Test
 
 1. Next step is to test TFT and installed library with the main.cpp test file.
 Wire up your TFT. Next enter the example folder and run the makefile in THAT folder,
-This second makefile builds the examples file using the just installed library.
+This second makefile builds the examples file using the just installed library,
 and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/)
 you should now see the test routines in that file running on TFT.
 
@@ -78,7 +78,7 @@ Software
 ----------------------
 
 In example/src/main.cpp file. There are three sections in "Setup()" function 
-where user can make adjustmentsto select for SPI type used, PCB type used and screen size.
+where user can make adjustments to select for SPI type used, PCB type used and screen size.
 
 1. USER OPTION 1 SPI/GPIO TYPE
 2. USER OPTION 2 SCREEN SECTION 
@@ -87,8 +87,8 @@ where user can make adjustmentsto select for SPI type used, PCB type used and sc
 **SPI**
 
 This library supports both Hardware SPI and software SPI.
-The parameters set for TFTSetupGPIO define which is used by default its Hardware.
-to switch between the two see notes in example/src/main.cpp file.(USER OPTION 1)
+The parameters set for TFTSetupGPIO define which is used, by default its Hardware.
+to switch between the two: see notes in example/src/main.cpp file.(USER OPTION 1)
 SPI Uses bcm2835 library.
 Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
 SPI settings can be viewed/changed in TFT_SPI_Initialize function,
@@ -114,7 +114,7 @@ There are 4 types of the ST7735 TFT display supported.
 | ---- | ---- | --- | 
 | 1 | ST7735B controller| TFT_ST7735B |
 | 2 | ST7735R Green Tab | TFT_ST7735R_Green |
-| 3 | ST7735R Red Tab | | TFT_ST7735R_Red |
+| 3 | ST7735R Red Tab   | TFT_ST7735R_Red |
 | 4 | ST7735S Black Tab | TFT_ST7735S_Black |
 
 
