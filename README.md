@@ -15,11 +15,11 @@ Overview
 * Name: ST7735_TFT_RPI
 * Description:
 
-0. C++ Library for TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
+0. C++ Library for a TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
 1. Dynamic install-able Raspberry Pi C++ library.
-2. Inverse colour, rotate, sleep, idle mode & verticaly scroll methods supported.
+2. Inverse colour, rotate, sleep, idle  & verticaly scroll modes supported.
 3. Seven fonts
-4. Graphics class included.
+4. Graphics + print class included.
 5. 24 bit colour , 16 bit color & bi-color Bitmaps supported.
 6. Hardware and Software SPI
 7. Dependency: bcm2835 Library
@@ -50,7 +50,7 @@ Installation
 curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.3.tar.gz | tar xz
 ```
 
-4. Run "make" to run the makefile to install library, it will be
+4. Install library. Run "make" to run the makefile to install library, it will be
     installed to usr/lib and usr/include
 
 ```sh
@@ -61,11 +61,11 @@ sudo make
 Test
 ----------------------------
 
-1. Next step is to test TFT and installed library with the main.cpp test file.
+1. Next step is to test TFT and installed library with the included main.cpp test example file.
 Wire up your TFT. Next enter the example folder and run the makefile in THAT folder,
 This second makefile builds the examples file using the just installed library,
 and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/)
-you should now see the test routines in that file running on TFT.
+you should now see the test routines in that file running on the display.
 
 ```sh
 cd example/
@@ -80,6 +80,7 @@ Software
 In example/src/main.cpp file. There are three sections in "Setup()" function 
 where user can make adjustments to select for SPI type used, PCB type used and screen size.
 
+
 1. USER OPTION 1 SPI/GPIO TYPE
 2. USER OPTION 2 SCREEN SECTION 
 3. USER OPTION 3 PCB_TYPE
@@ -92,7 +93,7 @@ to switch between the two: see notes in example/src/main.cpp file.(USER OPTION 1
 SPI Uses bcm2835 library.
 Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
 SPI settings can be viewed/changed in TFT_SPI_Initialize function,
-If you change them you will have to reinstall library.
+If you change them after install you will have to reinstall library.
 
 **Screen size  + Offsets**
 
@@ -149,19 +150,19 @@ Seven fonts available :
 | 2 | Thick   | 7x8 | ASCII  0x20 - 0x5A  ,no lowercase letters |
 | 3 | Seven segment | 4x8 | ASCII  0x20 - 0x7A |
 | 4 | Wide | 8x8 | ASCII 0x20 - 0x5A , no lowercase letters |
-| 3 | Tiny | 3x8 | ASCII  0x20 - 0x7A |
+| 5 | Tiny | 3x8 | ASCII  0x20 - 0x7A |
 | 6 | Big Nums | 16x32 | ASCII 0x2E-0x3A , Numbers + : . only |
 | 7 | Med Nums | 16x16 | ASCII 0x2E-0x3A , Numbers + : . only |
 
 The fonts 1-5 are byte high(at text size 1) scale-able fonts,
-The large numerical Fonts 5 & 6 cannot be scaled.
+The large numerical Fonts, 6 & 7 cannot be scaled.
 
 **Bitmap**
 
 There are four functions to support drawing bitmaps
 Note: The library was developed on a
 TFT without built-in SD card feature, so no SD-card support
-in this library.
+in this library at present.
 
 | Function Name | Colour support | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |
