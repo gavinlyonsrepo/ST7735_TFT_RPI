@@ -67,7 +67,7 @@ Test
 Wire up your TFT. Next enter the example folder and run the makefile in THAT folder,
 This second makefile builds the examples file using the just installed library,
 and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/)
-you should now see the test routines in that file running on the display.
+you should now see the test routines in that file running on the display. The example file is setup by default fro a 128x128 red tab TFT.
 
 ```sh
 cd example/
@@ -122,22 +122,14 @@ There are 4 types of the ST7735 TFT display supported.
 
 **Tested** 
  
-These two are only type of  ST7735 tested on but should work on other types in theory.
+These two are only type of ST7735 library tested on, but should work on other types in theory.
 
 1. TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44 , 128 x 128 pixels, "ST7735R Red Tab" 
 2. TFT SPI LCD, ST7735 Driver, RED PCB v1.2, 1.8 , 128 x 160 pixels, "ST7735S Black Tab" 
 
 The test files and full screen bitmaps are set up for number 1.  so user will have to modify 
-"USER OPTIONS 1 & 2" in main.cpp and provide own bitmap to test number 2.
+"USER OPTIONS" in main.cpp and provide own (128X160)bitmap to fully test number 2.
 No built-in SD card support at present and backlight control is left to user.
-
-**TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels**
-
-This Color TFT LCD display has 128 x 128 resolution.
-It uses SPI interface to communicate with controller. Onboard LDO, support 5V/3.3V input voltage,
-the LED backlight, 3.3V input. Size 1.44 inch, visual area 1.1 inch. Version 1.1.
-Backlight control is left to user.
-
 
 **Files**
 
