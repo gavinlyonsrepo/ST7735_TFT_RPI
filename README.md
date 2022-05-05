@@ -1,3 +1,5 @@
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/whitelight976)
+
 ![ ig ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/pcb.jpg)
 
 Table of contents
@@ -15,7 +17,7 @@ Overview
 * Name: ST7735_TFT_RPI
 * Description:
 
-0. C++ Library for a TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels.
+0. C++ Library for a TFT SPI LCD, ST7735 Driver
 1. Dynamic install-able Raspberry Pi C++ library.
 2. Inverse colour, rotate, sleep, idle  & verticaly scroll modes supported.
 3. Seven fonts
@@ -118,6 +120,16 @@ There are 4 types of the ST7735 TFT display supported.
 | 3 | ST7735R Red Tab   | TFT_ST7735R_Red |
 | 4 | ST7735S Black Tab | TFT_ST7735S_Black |
 
+**Tested** 
+ 
+These two are only type of  ST7735 tested on but should work on other types in theory.
+
+1. TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44 , 128 x 128 pixels, "ST7735R Red Tab" 
+2. TFT SPI LCD, ST7735 Driver, RED PCB v1.2, 1.8 , 128 x 160 pixels, "ST7735S Black Tab" 
+
+The test files and full screen bitmaps are set up for number 1.  so user will have to modify 
+"USER OPTIONS 1 & 2" in main.cpp and provide own bitmap to test number 2.
+No built-in SD card support at present and backlight control is left to user.
 
 **TFT SPI LCD, ST7735 Driver, RED PCB v1.1, 1.44'', 128 x 128 pixels**
 
