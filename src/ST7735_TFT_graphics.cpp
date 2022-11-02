@@ -55,24 +55,31 @@ void ST7735_TFT_graphics ::TFTsetAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, 
 
 void ST7735_TFT_graphics ::TFTfillRectangle(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
 	uint8_t hi, lo;
-	if ((x >= _widthTFT) || (y >= _heightTFT))
-		return;
-	if ((x + w - 1) >= _widthTFT)
-		w = _widthTFT - x;
-	if ((y + h - 1) >= _heightTFT)
-		h = _heightTFT - y;
-	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
+
+	// Check bounds
+	if ((x >= _widthTFT) || (y >= _heightTFT)) return;
+	if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
+	if ((y + h - 1) >= _heightTFT) h = _heightTFT - y;
+	
+	// Colour to bytes
 	hi = color >> 8;
 	lo = color;
+
+	// Create bitmap buffer
+	uint8_t* buffer = (uint8_t*)malloc(w*h*sizeof(uint16_t));
+	for(uint32_t i = 0; i<w*h*sizeof(uint16_t);) {
+		buffer[i++] = hi;
+		buffer[i++] = lo;
+	}
+
+	// Set window and write buffer
+	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
 	TFT_DC_SetHigh;
 	if (_hardwareSPI == false){TFT_CS_SetLow;}
-	for (y = h; y > 0; y--) {
-		for (x = w; x > 0; x--) {
-			spiWrite(hi);
-			spiWrite(lo);
-		}
-	}
+	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
 	if (_hardwareSPI == false){TFT_CS_SetHigh;}
+
+	free(buffer);
 }
 
 // Desc: Fills the whole screen with a given color.
@@ -624,19 +631,37 @@ void ST7735_TFT_graphics ::TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, 
 {
 	uint8_t i, j;
 	uint16_t color;
-	uint32_t rgb;
+	uint32_t rgb, ptr;
 
+	// Check bounds
+	if ((x >= _widthTFT) || (y >= _heightTFT)) return;
+	if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
+	if ((y + h - 1) >= _heightTFT) h = _heightTFT - y;
+	
+	// Create bitmap buffer
+	uint8_t* buffer = (uint8_t*)malloc(w * h * 2);
+
+	ptr = 0;
 	for(j = 0; j < h; j++)
 	{
 		for(i = 0; i < w ; i ++)
 		{
-			rgb = *(unsigned int*)(pBmp + i * 3 + j * 3 * w);
-			color = Color565(((rgb >> 16) & 0xFF),
-						  ((rgb >> 8) & 0xFF),
-						   (rgb & 0xFF));
-			TFTdrawPixel(x + i, y + h - 1 - j, color);
+			// Translate RBG24 to RGB565 bitmap 
+			rgb = *(unsigned int*)(pBmp + i * 3 + (h-1-j) * 3 * w);
+			color = Color565(((rgb >> 16) & 0xFF), ((rgb >> 8) & 0xFF), (rgb & 0xFF));
+			buffer[ptr++] = color >> 8;
+			buffer[ptr++] = color;
 		}
 	}
+
+	// Set window and write buffer
+	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
+	TFT_DC_SetHigh;
+	if (_hardwareSPI == false){TFT_CS_SetLow;}
+	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
+	if (_hardwareSPI == false){TFT_CS_SetHigh;}
+
+	free(buffer);
 }
 
 
@@ -783,12 +808,32 @@ void ST7735_TFT_graphics ::writeData(uint8_t data_) {
 	TFT_CS_SetHigh;
 }
 
-// Desc: Write to SPI, both Software and hardware SPI supported
-// Param1:  byte to send
+// Desc: Write SPI databuffer
+// Param1: data array to send
+
+void ST7735_TFT_graphics ::writeDataBuffer(uint8_t* data_, uint32_t len) {
+	TFT_DC_SetHigh;
+	TFT_CS_SetLow;
+	spiWriteBuffer(data_, len);
+	TFT_CS_SetHigh;
+}
+
+// Desc: Write to SPI
+// Param1: byte to send
 
 void ST7735_TFT_graphics::spiWrite(uint8_t spidata) {
-if (_hardwareSPI == false)
-{
+	if (_hardwareSPI == false)
+	{
+		spiWriteSoftware(spidata);
+	} else {
+		bcm2835_spi_transfer(spidata);
+	}
+}
+
+// Desc: Write a byte to SPI using software SPI
+// Param1: byte to send
+
+void ST7735_TFT_graphics::spiWriteSoftware(uint8_t spidata) {
 	uint8_t i;
 	for (i = 0; i < 8; i++) {
 		TFT_SDATA_SetLow;
@@ -798,12 +843,21 @@ if (_hardwareSPI == false)
 		spidata <<= 1;
 		TFT_SCLK_SetLow;
 		bcm2835_delayMicroseconds(TFT_HIGHFREQ_DELAY);
-
 	}
-}else{
-	bcm2835_spi_transfer(spidata);
 }
 
+// Desc: Write a buffer to SPI, both Software and hardware SPI supported
+// Param1: bytes to send
+// Param2: length of buffer
+
+void ST7735_TFT_graphics::spiWriteBuffer(uint8_t* spidata, uint32_t len) {
+	if(_hardwareSPI == false) {
+		for(uint32_t i=0; i<len; i++) {
+			spiWriteSoftware(spidata[i]);
+		}
+	} else {
+		bcm2835_spi_writenb((char*)spidata,len);
+	}
 }
 
 void ST7735_TFT_graphics::TFTsetCursor(int16_t x, int16_t y) {

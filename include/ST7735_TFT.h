@@ -159,9 +159,11 @@ public:
 	void TFTSetupGPIO(int8_t, int8_t, int8_t, int8_t, int8_t);
 	void TFTInitScreenSize(uint8_t xOffset, uint8_t yOffset, uint16_t w, uint16_t h);
 	void TFTInitPCBType(TFT_PCBtype_e);
+	void TFTInitSPIClockFrequency(uint32_t hertz);
 	void TFTPowerDown(void);
 	
 	void TFTsetRotation(TFT_rotate_e r);
+	void TFTchangeInvertMode(bool invertModeOn);
 	void TFTchangeMode(TFT_modes_e m);
 	void TFTsetScrollDefinition(uint8_t th, uint8_t tb, bool sd);
 	void TFTVerticalScroll(uint8_t vsp);
