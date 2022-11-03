@@ -286,31 +286,25 @@ void ST7735_TFT ::Bcmd() {
 // Desc: init routine
 
 void ST7735_TFT ::Rcmd1() {
+	
+
 	writeCommand(ST7735_SWRESET);
 	bcm2835_delay(150);
 	writeCommand(ST7735_SLPOUT);
 	bcm2835_delay(500);
 	writeCommand(ST7735_FRMCTR1);
-	writeData(0x01);
-	writeData(0x2C);
-	writeData(0x2D);
+	static uint8_t seq1[] { 0x01, 0x2C, 0x2D };
+	writeDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_FRMCTR2);
-	writeData(0x01);
-	writeData(0x2C);
-	writeData(0x2D);
+	writeDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_FRMCTR3);
-	writeData(0x01);
-	writeData(0x2C);
-	writeData(0x2D);
-	writeData(0x01);
-	writeData(0x2C);
-	writeData(0x2D);
+	static uint8_t seq2[] { 0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D }; 
+	writeDataBuffer(seq2, sizeof(seq2));
 	writeCommand(ST7735_INVCTR);
 	writeData(0x07);
 	writeCommand(ST7735_PWCTR1);
-	writeData(0xA2);
-	writeData(0x02);
-	writeData(0x84);
+	static uint8_t seq3[] { 0xA2, 0x02, 0x84 }; 
+	writeDataBuffer(seq3, sizeof(seq3));
 	writeCommand(ST7735_PWCTR2);
 	writeData(0xC5);
 	writeCommand(ST7735_PWCTR3);
@@ -436,6 +430,14 @@ void ST7735_TFT ::TFTVerticalScroll(uint8_t _vsp) {
 	writeCommand(ST7735_VSCRSADD);
 	writeData(0x00);
 	writeData(_vsp);
+}
+
+void ST7735_TFT ::TFTchangeInvertMode(bool invertModeOn) {
+	if(invertModeOn) {
+		writeCommand(ST7735_INVON);
+	} else {
+		writeCommand(ST7735_INVOFF);
+	}
 }
 
 /*
@@ -597,4 +599,12 @@ void ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType)
 		break;
 	}
 }
+
+// Func Desc : intialise Hardware SPI Clock Frequency
+// Param 1: uint32_t Clock frequency in Hz
+void ST7735_TFT  :: TFTInitSPIClockFrequency(uint32_t hertz) 
+{
+	bcm2835_spi_setClockDivider(bcm2835_aux_spi_CalcClockDivider(hertz));
+}
+
 //**************** EOF *****************

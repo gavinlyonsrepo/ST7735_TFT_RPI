@@ -116,11 +116,15 @@ protected:
 
 	void pushColor(uint16_t color);
 	int16_t Color565(int16_t ,int16_t , int16_t );
-	void spiWrite(uint8_t);
 	void writeCommand(uint8_t);
 	void writeData(uint8_t);
+	void writeDataBuffer(uint8_t* data_, uint32_t len);
 	void drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
 	void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color);
+
+	void spiWrite(uint8_t);
+	void spiWriteSoftware(uint8_t spidata);
+	void spiWriteBuffer(uint8_t* spidata, uint32_t len);
 	
 	bool _hardwareSPI=true;
 	
