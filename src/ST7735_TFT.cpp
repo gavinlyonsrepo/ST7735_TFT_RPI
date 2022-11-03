@@ -602,6 +602,7 @@ void ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType)
 
 // Func Desc : intialise Hardware SPI Clock Frequency
 // Param 1: uint32_t Clock frequency in Hz
+// Note :: Call after method TFTInitPCBType in setup order
 void ST7735_TFT  :: TFTInitSPIClockFrequency(uint32_t hertz) 
 {
 	bcm2835_spi_setClockDivider(bcm2835_aux_spi_CalcClockDivider(hertz));

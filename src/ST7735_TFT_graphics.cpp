@@ -52,7 +52,7 @@ void ST7735_TFT_graphics ::TFTsetAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, 
 }
 
 // Desc: fills a rectangle starting from coordinates (x,y) with width of w and height of h.
-
+// Note as of version 1.4 uses spiWriteBuffer method
 void ST7735_TFT_graphics ::TFTfillRectangle(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t color) {
 	uint8_t hi, lo;
 
@@ -626,7 +626,7 @@ void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_
 // Param 3 A pointer to the databuffer containing Bitmap data
 // Param 4,5: width and height 0-127 possible values width and height of bitmap in pixels
 // Note 24 bit color converted to 16 bit color bv color 565 function.
-
+// Note as of version 1.4 uses spiWriteBuffer method
 void ST7735_TFT_graphics ::TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h)
 {
 	uint8_t i, j;

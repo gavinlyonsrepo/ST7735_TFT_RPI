@@ -25,6 +25,7 @@
 
 // Section :: Globals 
 ST7735_TFT myTFT;
+bool bTestFPS = false; // Optional ,runs FPS test at end if true.
 
 //  Section ::  Function Headers 
 
@@ -51,9 +52,8 @@ void Test15(void); // 16 color bitmap
 void TestFPS(void); // Frames per second
 void EndTests(void);
 
-// Utility
-int64_t getTime();
-uint8_t* loadImage(char* name);
+int64_t getTime(); // Utility for FPS test
+uint8_t* loadImage(char* name); // Utility for FPS test
 
 //  Section ::  MAIN loop
 
@@ -88,9 +88,9 @@ int main(void)
 	Test12();
 	Test14();
 	Test15();
-	TestFPS();
+	if (bTestFPS == true) TestFPS();
 
-	// EndTests();
+	EndTests();
 	return 0;
 }
 // *** End OF MAIN **
@@ -100,34 +100,39 @@ int main(void)
 
 void Setup(void)
 {
+
+	bcm2835_delay(TEST_DELAY1);
+	printf("TFT Start\r\n");
 	
-// ****** USER OPTION 1 Screen Setup ****** 
-	uint8_t OFFSET_COL = 26;  // 2, These offsets can be adjusted for any issues->
-	uint8_t OFFSET_ROW = 1; // 3, with manufacture tolerance/defects
-	uint16_t TFT_WIDTH = 80;// Screen width in pixels
+// ******** USER OPTION 2 GPIO/SPI TYPE HW OR SW *********
+	int8_t RST_TFT = 25;
+	int8_t DC_TFT = 24;
+	int8_t SCLK_TFT = -1; // 11, change to GPIO no for software spi
+	int8_t SDIN_TFT = -1; // 10, change to GPIO no for software spi
+	int8_t CS_TFT = -1 ;  // 8, change to GPIO no for software spi
+//**********************************************************
+
+// ****** USER OPTION 2 Screen Setup ****** 
+	uint8_t OFFSET_COL = 0;  // 2, These offsets can be adjusted for any issues->
+	uint8_t OFFSET_ROW = 0; // 3, with manufacture tolerance/defects
+	uint16_t TFT_WIDTH = 128;// Screen width in pixels
 	uint16_t TFT_HEIGHT = 160; // Screen height in pixels
 // ******************************************
 
-// ******** USER OPTION 2 GPIO/SPI TYPE *************************
-	int8_t RST_TFT = 25;
-	int8_t DC_TFT = 24;
-	int8_t SCLK_TFT = -1; // 11,  change to GPIO no for software spi
-	int8_t SDIN_TFT = -1; // 10, change to GPIO no for software spi
-	int8_t CS_TFT = -1 ;  // 8, change to GPIO no for software spi
-	int32_t SCLK_FREQ = 50000000;
-//**********************************************************
-	bcm2835_delay(TEST_DELAY1);
-	printf("TFT Start\r\n");
 	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT, CS_TFT, SCLK_TFT, SDIN_TFT);
-	myTFT.TFTInitSPIClockFrequency(SCLK_FREQ);
 	myTFT.TFTInitScreenSize(OFFSET_COL, OFFSET_ROW , TFT_WIDTH , TFT_HEIGHT);
+
 // ******** USER OPTION 3 PCB_TYPE **************************
-// init PCB type , pass enum 4 choices, see readme
-	myTFT.TFTInitPCBType(TFT_ST7735R_Red);
-	myTFT.TFTsetRotation(TFT_Degress_270);
-	myTFT.TFTchangeInvertMode(true);
+	myTFT.TFTInitPCBType(TFT_ST7735S_Black); // pass enum,4 choices,see README
 //**********************************************************
 
+//*************** USER OPTION 4 SPI_SPEED ***********
+	uint32_t SCLK_FREQ =  8000000 ; // Spi freq in Hertz , MAX 125 Mhz MIN 30Khz
+	myTFT.TFTInitSPIClockFrequency(SCLK_FREQ); // optional, default is 12.5MHz
+//**********************************************************
+	
+	//myTFT.TFTsetRotation(TFT_Degress_270);
+	//myTFT.TFTchangeInvertMode(true);
 }
 
 void Test0(void) {

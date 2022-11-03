@@ -49,14 +49,14 @@ Installation
 	* Run following command to download from github.
 
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.3.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.4.tar.gz | tar xz
 ```
 
 4. Install library. Run "make" to run the makefile to install library, it will be
     installed to usr/lib and usr/include
 
 ```sh
-cd ST7735_TFT_RPI-1.3
+cd ST7735_TFT_RPI-1.4
 sudo make
 ```
 
@@ -86,16 +86,14 @@ where user can make adjustments to select for SPI type used, PCB type used and s
 1. USER OPTION 1 SPI/GPIO TYPE
 2. USER OPTION 2 SCREEN SECTION 
 3. USER OPTION 3 PCB_TYPE
+4. USER OPTION 4 SPI SPEED
 
-**SPI**
+**SPI TYPE / GPIO**
 
 This library supports both Hardware SPI and software SPI.
 The parameters set for TFTSetupGPIO define which is used, by default its Hardware.
-to switch between the two: see notes in example/src/main.cpp file.(USER OPTION 1)
-SPI Uses bcm2835 library.
-Tested at bcm2835 SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
-SPI settings can be viewed/changed in TFT_SPI_Initialize function,
-If you change them after install you will have to reinstall library.
+to switch between the two: set SCLK SDIN and CS to -1 for Hardware SPI
+set thtme ot GPIO numbers for SW SPI
 
 **Screen size  + Offsets**
 
@@ -110,7 +108,7 @@ The function TFTInitScreenSize sets them.
 It should work in theory on other TFT displays using the different init functions, 
 but not tested. In the main.cpp in USER OPTION 3 PCB_TYPE select your PCB.
 By passing an enum type to function  TFTInitPCBType.
-Default is "TFT_ST7735R_Red". 
+Default is "TFT_ST7735S_Black". 
 
 There are 4 types of the ST7735 TFT display supported.
 | Number | Description | Enum label|
@@ -119,6 +117,13 @@ There are 4 types of the ST7735 TFT display supported.
 | 2 | ST7735R Green Tab | TFT_ST7735R_Green |
 | 3 | ST7735R Red Tab   | TFT_ST7735R_Red |
 | 4 | ST7735S Black Tab | TFT_ST7735S_Black |
+
+
+**SPI SPEED** 
+Here the user can pass the SPI Bus freq in Hertz,
+Maximum 125 Mhz , Minimum 30Khz, The default in file is 8Mhz 
+This option is optional if you don't call it Speed is set to bcm2835 
+constant BCM2835_SPI_CLOCK_DIVIDER_32.
 
 **Tested** 
  

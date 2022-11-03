@@ -18,7 +18,7 @@ OBJS = $(patsubst $(SRC)/%.cpp,  $(OBJ)/%.o, $(SRCS))
 BIN=./bin
 TARGET=$(BIN)/test
 
-all: pre-build $(TARGET) 
+all: clean pre-build $(TARGET) 
 
 run:
 	sudo $(TARGET) 
@@ -42,6 +42,7 @@ $(OBJ)/%.o :  $(SRC)/%.cpp   $(OBJ)
 	$(CC) $(CFLAGS) $< -o  $@ 
 
 clean:
+	@echo '***************'
 	@echo 'CLEANUP!'
 	rm -vf  $(OBJS) $(TARGET)
 	@echo 'DONE!'
