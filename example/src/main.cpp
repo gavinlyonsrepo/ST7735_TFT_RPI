@@ -1,17 +1,18 @@
 /*
- * Project Name: ST7735, 128 by 128, 1.44", red pcb, v1.1 SPI TFT  
+ * Project Name: ST7735_TFT_RPI  
  * File: main.cpp
  * Description: library test file  
  * Author: Gavin Lyons.
  * Created May 2021
  * Description: See URL for full details.
+ * NOTE :: USER OPTIONS 1-4 in SETUP function
  * URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
  */
 
 // Section ::  libraries 
 #include <bcm2835.h> // for SPI GPIO and delays.
 #include <stdio.h> // for printf
-#include <time.h> // for test 11
+#include <time.h> // for test 11 & FPS
 
 #include "ST7735_TFT.h"
 #include "Bi_Color_Bitmap.h" // Data for test 11 and 12.
@@ -46,18 +47,16 @@ void Test8(void);  // More shapes, media buttons graphic.
 void Test9(void);  // Rotate
 void Test10(void); // change modes test -> Invert, display on/off and Sleep.
 void Test11(void); // "clock demo" icons, small bi-color bitmaps, font 6 & 7
-void Test12(void); // 2  color bitmap
+void Test12(void); // 2 color bitmap
 void Test14(void); // 24 color bitmap
 void Test15(void); // 16 color bitmap 
-void TestFPS(void); // Frames per second
+void TestFPS(void); // Frames per second 24 color bitmap test, optional
 void EndTests(void);
 
 int64_t getTime(); // Utility for FPS test
 uint8_t* loadImage(char* name); // Utility for FPS test
 
 //  Section ::  MAIN loop
-
-
 
 int main(void) 
 {
@@ -101,29 +100,29 @@ int main(void)
 void Setup(void)
 {
 
-	bcm2835_delay(TEST_DELAY1);
+	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	printf("TFT Start\r\n");
 	
 // ******** USER OPTION 2 GPIO/SPI TYPE HW OR SW *********
 	int8_t RST_TFT = 25;
 	int8_t DC_TFT = 24;
-	int8_t SCLK_TFT = -1; // 11, change to GPIO no for software spi
-	int8_t SDIN_TFT = -1; // 10, change to GPIO no for software spi
-	int8_t CS_TFT = -1 ;  // 8, change to GPIO no for software spi
+	int8_t SCLK_TFT = -1; // 11, change to GPIO no for sw spi, -1 hw spi
+	int8_t SDIN_TFT = -1; // 10, change to GPIO no for sw spi, -1 hw spi
+	int8_t CS_TFT = -1 ;  // 8, change to GPIO no for sw spi, -1 hw spi
 //**********************************************************
 
 // ****** USER OPTION 2 Screen Setup ****** 
 	uint8_t OFFSET_COL = 0;  // 2, These offsets can be adjusted for any issues->
 	uint8_t OFFSET_ROW = 0; // 3, with manufacture tolerance/defects
 	uint16_t TFT_WIDTH = 128;// Screen width in pixels
-	uint16_t TFT_HEIGHT = 160; // Screen height in pixels
+	uint16_t TFT_HEIGHT = 128; // Screen height in pixels
 // ******************************************
 
 	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT, CS_TFT, SCLK_TFT, SDIN_TFT);
 	myTFT.TFTInitScreenSize(OFFSET_COL, OFFSET_ROW , TFT_WIDTH , TFT_HEIGHT);
 
 // ******** USER OPTION 3 PCB_TYPE **************************
-	myTFT.TFTInitPCBType(TFT_ST7735S_Black); // pass enum,4 choices,see README
+	myTFT.TFTInitPCBType(TFT_ST7735R_Red); // pass enum,4 choices,see README
 //**********************************************************
 
 //*************** USER OPTION 4 SPI_SPEED ***********
@@ -155,7 +154,7 @@ void Test0(void) {
 	myTFT.TFTdrawText(0, 75, teststr4, ST7735_CYAN, ST7735_BLACK, 2);
 	myTFT.TFTFontNum(TFTFont_Tiny);
 	myTFT.TFTdrawText(0, 100, teststr5, ST7735_RED, ST7735_BLACK, 2);
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTFontNum(TFTFont_Default);
 }
@@ -182,7 +181,7 @@ void Test1A(void) {
 	myTFT.TFTdrawText(0, 85, teststr8, ST7735_GREY, ST7735_BLACK, 1);
 	myTFT.TFTdrawText(0, 95, teststr9, ST7735_TAN, ST7735_BLACK, 1);
 	myTFT.TFTdrawText(0, 105, teststr10 , ST7735_BROWN, ST7735_BLACK, 1);
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -197,10 +196,10 @@ void Test1B(void) {
 			row += 10;
 			col = 0;
 		}
-		bcm2835_delay(20);
+		TFT_MILLISEC_DELAY(20);
 	}
 
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -218,7 +217,7 @@ void Test1C(void)
 	sprintf(myStr2, "%0.3f", myPI);
 	myTFT.TFTdrawText(5, 65, myStr2, ST7735_RED, ST7735_BLACK, 3);
 	
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 		
 }
@@ -256,7 +255,7 @@ void Test1D(void){
 	myTFT.TFTFontNum(TFTFont_Mednum);
 	myTFT.print(76.88);
 	
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -274,7 +273,7 @@ void Test1E(void)
 	myTFT.TFTdrawCharNumFont(0, 75, '7',  ST7735_WHITE, ST7735_BLACK);
 	myTFT.TFTdrawTextNumFont(0, 100, teststr2, ST7735_GREEN, ST7735_RED);
 	
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -287,7 +286,7 @@ void Test2(void) {
 	myTFT.TFTdrawChar(0, 85, 'G', ST7735_WHITE, ST7735_BLACK, 5);
 	myTFT.TFTdrawChar(45, 85, 'L', ST7735_WHITE, ST7735_BLACK, 5);
 
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -300,7 +299,7 @@ void Test3(void)
 	myTFT.TFTdrawFastVLine(40, 40, 40, ST7735_GREEN);
 	myTFT.TFTdrawFastHLine(60, 60, 40, ST7735_YELLOW);
 
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -311,7 +310,7 @@ void Test4(void) {
 	myTFT.TFTdrawRoundRect(15, 60, 50, 50, 5, ST7735_CYAN);
 	myTFT.TFTfillRoundRect(70, 60, 50, 50, 10, ST7735_WHITE);
 
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -324,7 +323,7 @@ void Test6(void) {
 	myTFT.TFTdrawTriangle(5, 80, 50, 40, 95, 80, ST7735_CYAN);
 	myTFT.TFTfillTriangle(55, 120, 100, 90, 127, 120, ST7735_RED);
 
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
@@ -347,9 +346,9 @@ void Test7(void)
 		myTFT.TFTVerticalScroll(pos + TOP_FIXED);
 		pos++;
 		// check pos if necessary: must be < tftTFT_HEIGHT - TOP_FIXED - BOTTOM_FIXED
-		bcm2835_delay(20);  
+		TFT_MILLISEC_DELAY(20);  
 	}
-	bcm2835_delay(TEST_DELAY1);
+	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	}
 	myTFT.TFTchangeMode(TFT_Normal_mode); 
 	myTFT.TFTfillScreen(ST7735_BLACK);
@@ -362,14 +361,14 @@ void Test8()
 	myTFT.TFTfillRoundRect(25, 10, 78, 60, 8, ST7735_WHITE);
 	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_RED);
 	myTFT.TFTdrawText(5, 80, teststr1, ST7735_GREEN, ST7735_BLACK, 2);
-	bcm2835_delay(TEST_DELAY1);
+	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	
 	// change play color
 	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_BLUE);
-	bcm2835_delay(TEST_DELAY1);
+	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	// change play color
 	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_GREEN);
-	bcm2835_delay(TEST_DELAY1);
+	TFT_MILLISEC_DELAY(TEST_DELAY1);
 }
 
 void Test9()
@@ -382,22 +381,22 @@ void Test9()
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTsetRotation(TFT_Degress_0);
 	myTFT.TFTdrawText(20, 20, teststr0, ST7735_GREEN, ST7735_BLACK, 1);
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTsetRotation(TFT_Degress_90);
 	myTFT.TFTdrawText(20, 20, teststr1, ST7735_GREEN, ST7735_BLACK, 1);
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTsetRotation(TFT_Degress_180);
 	myTFT.TFTdrawText(20, 20, teststr2, ST7735_GREEN, ST7735_BLACK, 1);
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTsetRotation(TFT_Degress_270);
 	myTFT.TFTdrawText(20, 20, teststr3, ST7735_GREEN, ST7735_BLACK, 1);
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	
 	myTFT.TFTsetRotation(TFT_Degress_0);
 	myTFT.TFTchangeMode(TFT_Normal_mode);
@@ -409,19 +408,19 @@ void Test10()
 	char teststr1[] = "Mode test";
 	myTFT.TFTfillRoundRect(25, 10, 78, 60, 8, ST7735_YELLOW);
 	myTFT.TFTdrawText(30, 80, teststr1, ST7735_WHITE, ST7735_RED, 1);
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTchangeMode(TFT_Normal_mode);
-	 bcm2835_delay(TEST_DELAY2);
+	 TFT_MILLISEC_DELAY(TEST_DELAY2);
 	 myTFT.TFTchangeMode(TFT_Invert_mode);
-	 bcm2835_delay(TEST_DELAY2);
+	 TFT_MILLISEC_DELAY(TEST_DELAY2);
 	 myTFT.TFTchangeMode(TFT_Normal_mode);
-	 bcm2835_delay(TEST_DELAY2);
+	 TFT_MILLISEC_DELAY(TEST_DELAY2);
 	 myTFT.TFTchangeMode(TFT_Display_off_mode);
-	 bcm2835_delay(TEST_DELAY2);
+	 TFT_MILLISEC_DELAY(TEST_DELAY2);
 	 myTFT.TFTchangeMode(TFT_Display_on_mode);
-	 bcm2835_delay(TEST_DELAY2);
+	 TFT_MILLISEC_DELAY(TEST_DELAY2);
 	 myTFT.TFTchangeMode(TFT_Sleep_mode);
-	 bcm2835_delay(TEST_DELAY2);
+	 TFT_MILLISEC_DELAY(TEST_DELAY2);
 	 myTFT.TFTchangeMode(TFT_Normal_mode);
 }
 
@@ -466,20 +465,30 @@ void Test11(void)
 		
 		if(count==1)break;
 	}
-	bcm2835_delay(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTFontNum(TFTFont_Default);
 }
 
 void Test12(void)
 {
+myTFT.TFTfillScreen(ST7735_BLACK);
+char teststr1[] = "Bitmap 2 ";
+myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
+TFT_MILLISEC_DELAY(TEST_DELAY2);
+
 myTFT.TFTdrawBitmap(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, backupMenuBitmap);
-bcm2835_delay(TEST_DELAY5);
+TFT_MILLISEC_DELAY(TEST_DELAY5);
 }
 
 // All files Windows BITMAPINFOHEADER offset 54
 void Test14(void)
 {
+	myTFT.TFTfillScreen(ST7735_BLACK);
+	char teststr1[] = "Bitmap 24";
+	myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
+	
 	FILE *pFile ;
 	
 	size_t pixelSize = 3;
@@ -497,7 +506,7 @@ void Test14(void)
 
 	myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128);
 
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	
 	pFile = fopen("bitmap/24pic2.bmp", "r");
 	if (pFile == NULL) {
@@ -510,7 +519,7 @@ void Test14(void)
 
 	myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128);
 
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	
 	pFile = fopen("bitmap/24pic3.bmp", "r");
 	if (pFile == NULL) {
@@ -523,7 +532,7 @@ void Test14(void)
 
 	myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128);
 	
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	
 }
@@ -531,6 +540,11 @@ void Test14(void)
 
 void Test15(void)
 {
+	myTFT.TFTfillScreen(ST7735_BLACK);
+	char teststr1[] = "Bitmap 16";
+	myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
+	
 	FILE *pFile ;
 	size_t pixelSize = 2;
 	unsigned char bmpBuffer1[(128 * 128) * pixelSize ];
@@ -548,7 +562,7 @@ void Test15(void)
 	fclose(pFile);
 	myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
 	
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	
 	// file 2 OS/2 OS22XBITMAPHEADER (BITMAPINFOHEADER2) offset 72
 	// made in GIMP Color,  NO color space information written 
@@ -563,7 +577,7 @@ void Test15(void)
 	fclose(pFile);
 	myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
 	
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	
 	// file 3 OS/2 OS22XBITMAPHEADER (BITMAPINFOHEADER2) offset 72
 	// made in GIMP Color NO color space information written 
@@ -578,7 +592,7 @@ void Test15(void)
 	fclose(pFile);
 	myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
 	
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	
 }
@@ -627,7 +641,7 @@ void EndTests(void)
 	char teststr1[] = "Tests over";
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTdrawText(5, 50, teststr1, ST7735_GREEN, ST7735_BLACK, 2);
-	bcm2835_delay(TEST_DELAY5);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTPowerDown(); // Power down device
 	bcm2835_close(); // Close the bcm2835 library
 	printf("TFT End\r\n");
@@ -635,11 +649,11 @@ void EndTests(void)
 
 int64_t getTime() {
 	struct timespec tms;
-    if (clock_gettime(CLOCK_REALTIME,&tms)) return -1;
-    int64_t micros = tms.tv_sec * 1000000;
-    micros += tms.tv_nsec/1000;
-    if (tms.tv_nsec % 1000 >= 500) ++micros;
-    return micros;
+	if (clock_gettime(CLOCK_REALTIME,&tms)) return -1;
+	int64_t micros = tms.tv_sec * 1000000;
+	micros += tms.tv_nsec/1000;
+	if (tms.tv_nsec % 1000 >= 500) ++micros;
+	return micros;
 }
 
 uint8_t* loadImage(char* name) {

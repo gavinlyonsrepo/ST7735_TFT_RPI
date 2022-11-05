@@ -36,14 +36,14 @@ void ST7735_TFT::TFTSPIInitialize(void)
 void ST7735_TFT ::TFTPowerDown(void)
 {
 	TFTchangeMode(TFT_Display_off_mode);
-	bcm2835_gpio_write(_TFT_DC, LOW);
-	bcm2835_gpio_write(_TFT_RST, LOW);
+	TFT_DC_SetLow;
+	TFT_RST_SetLow;
 	
 if (_hardwareSPI == false)
 {
-	bcm2835_gpio_write(_TFT_SCLK, LOW);
-	bcm2835_gpio_write(_TFT_SDATA, LOW);
-	bcm2835_gpio_write(_TFT_CS, LOW);
+	TFT_SCLK_SetLow;
+	TFT_SDATA_SetLow;
+	TFT_CS_SetLow;
 }else{ 
 	bcm2835_spi_end();
 	} 
@@ -54,11 +54,11 @@ if (_hardwareSPI == false)
 void ST7735_TFT ::TFTResetPIN() {
 	TFT_RST_SetDigitalOutput;
 	TFT_RST_SetHigh;
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	TFT_RST_SetLow;
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	TFT_RST_SetHigh;
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 }
 
 // Desc : sets up TFT GPIO
@@ -197,17 +197,17 @@ if (_hardwareSPI == false)
 
 void ST7735_TFT ::Bcmd() {
 	writeCommand(ST7735_SWRESET);
-	bcm2835_delay(50);
+	TFT_MILLISEC_DELAY(50);
 	writeCommand(ST7735_SLPOUT);
-	bcm2835_delay(500);
+	TFT_MILLISEC_DELAY(500);
 	writeCommand(ST7735_COLMOD);
 	writeData(0x05);
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_FRMCTR1);
 	writeData(0x00);
 	writeData(0x06);
 	writeData(0x03);
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_MADCTL);
 	writeData(0x08);
 	writeCommand(ST7735_DISSET5);
@@ -218,7 +218,7 @@ void ST7735_TFT ::Bcmd() {
 	writeCommand(ST7735_PWCTR1);
 	writeData(0x02);
 	writeData(0x70);
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_PWCTR2);
 	writeData(0x05);
 	writeCommand(ST7735_PWCTR3);
@@ -227,45 +227,17 @@ void ST7735_TFT ::Bcmd() {
 	writeCommand(ST7735_VMCTR1);
 	writeData(0x3C);
 	writeData(0x38);
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_PWCTR6);
 	writeData(0x11);
 	writeData(0x15);
 	writeCommand(ST7735_GMCTRP1);
-	writeData(0x09);
-	writeData(0x16);
-	writeData(0x09);
-	writeData(0x20);
-	writeData(0x21);
-	writeData(0x1B);
-	writeData(0x13);
-	writeData(0x19);
-	writeData(0x17);
-	writeData(0x15);
-	writeData(0x1E);
-	writeData(0x2B);
-	writeData(0x04);
-	writeData(0x05);
-	writeData(0x02);
-	writeData(0x0E);
+	static uint8_t seq6[] {0x09, 0x16, 0x09, 0x20, 0x21, 0x1B, 0x13, 0x19, 0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E}; 
+	writeDataBuffer(seq6, sizeof(seq6));
 	writeCommand(ST7735_GMCTRN1);
-	writeData(0x0B);
-	writeData(0x14);
-	writeData(0x08);
-	writeData(0x1E);
-	writeData(0x22);
-	writeData(0x1D);
-	writeData(0x18);
-	writeData(0x1E);
-	writeData(0x1B);
-	writeData(0x1A);
-	writeData(0x24);
-	writeData(0x2B);
-	writeData(0x06);
-	writeData(0x06);
-	writeData(0x02);
-	writeData(0x0F);
-	bcm2835_delay(10);
+	static uint8_t seq7[] {0x0B, 0x14, 0x08, 0x1E, 0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F}; 
+	writeDataBuffer(seq7, sizeof(seq7));
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_CASET);
 	writeData(0x00);
 	writeData(0x02);
@@ -277,9 +249,9 @@ void ST7735_TFT ::Bcmd() {
 	writeData(0x08);
 	writeData(0xA0);
 	writeCommand(ST7735_NORON);
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_DISPON);
-	bcm2835_delay(500);
+	TFT_MILLISEC_DELAY(500);
 }
 
 
@@ -289,9 +261,9 @@ void ST7735_TFT ::Rcmd1() {
 	
 
 	writeCommand(ST7735_SWRESET);
-	bcm2835_delay(150);
+	TFT_MILLISEC_DELAY(150);
 	writeCommand(ST7735_SLPOUT);
-	bcm2835_delay(500);
+	TFT_MILLISEC_DELAY(500);
 	writeCommand(ST7735_FRMCTR1);
 	static uint8_t seq1[] { 0x01, 0x2C, 0x2D };
 	writeDataBuffer(seq1, sizeof(seq1));
@@ -344,43 +316,15 @@ void ST7735_TFT ::Rcmd2red() {
 
 void ST7735_TFT ::Rcmd3() {
 	writeCommand(ST7735_GMCTRP1);
-	writeData(0x02);
-	writeData(0x1C);
-	writeData(0x07);
-	writeData(0x12);
-	writeData(0x37);
-	writeData(0x32);
-	writeData(0x29);
-	writeData(0x2D);
-	writeData(0x29);
-	writeData(0x25);
-	writeData(0x2B);
-	writeData(0x39);
-	writeData(0x00);
-	writeData(0x01);
-	writeData(0x03);
-	writeData(0x10);
+	static uint8_t seq4[] {0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10}; 
+	writeDataBuffer(seq4, sizeof(seq4));
 	writeCommand(ST7735_GMCTRN1);
-	writeData(0x03);
-	writeData(0x1D);
-	writeData(0x07);
-	writeData(0x06);
-	writeData(0x2E);
-	writeData(0x2C);
-	writeData(0x29);
-	writeData(0x2D);
-	writeData(0x2E);
-	writeData(0x2E);
-	writeData(0x37);
-	writeData(0x3F);
-	writeData(0x00);
-	writeData(0x00);
-	writeData(0x02);
-	writeData(0x10);
+	static uint8_t seq5[] {0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10}; 
+	writeDataBuffer(seq5, sizeof(seq5));
 	writeCommand(ST7735_NORON);
-	bcm2835_delay(10);
+	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_DISPON);
-	bcm2835_delay(100);
+	TFT_MILLISEC_DELAY(100);
 }
 
 
@@ -461,7 +405,7 @@ void ST7735_TFT ::TFTchangeMode(TFT_modes_e mode) {
 			}
 			if (_currentMode == TFT_Sleep_mode) {//was in sleep?
 				writeCommand(ST7735_SLPOUT);
-				bcm2835_delay(120);
+				TFT_MILLISEC_DELAY(120);
 			}
 			if (_currentMode == TFT_Invert_mode) {//was inverted?
 				_currentMode = TFT_Normal_mode;
@@ -481,7 +425,7 @@ void ST7735_TFT ::TFTchangeMode(TFT_modes_e mode) {
 		case TFT_Sleep_mode:
 			writeCommand(ST7735_SLPIN);
 			_currentMode = TFT_Sleep_mode;
-			bcm2835_delay(5);
+			TFT_MILLISEC_DELAY(5);
 			return;
 		case TFT_Invert_mode:
 			writeCommand(ST7735_INVON);

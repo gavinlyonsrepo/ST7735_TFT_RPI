@@ -603,10 +603,22 @@ void ST7735_TFT_graphics ::TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t
 // Param 3,4 0-127 possible values width and height of bitmap in pixels
 // Param 4,5 bitmap colors ,bitmap is bi-color
 // Param 6: an array of unsigned chars containing bitmap data horizontally addressed.
-
-void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const unsigned char bitmap[]) {
+// Note as of version 1.4 uses spiWriteBuffer method
+void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, uint8_t *pBmp) {
 	int16_t byteWidth = (w + 7) / 8;
 	uint8_t byte = 0;
+	uint16_t mycolor = 0;
+	uint32_t ptr;
+	int16_t temp_y=y;
+	// Check bounds
+	if ((x >= _widthTFT) || (y >= _heightTFT)) return;
+	if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
+	if ((y + h - 1) >= _heightTFT) h = _heightTFT - y;
+	
+	// Create bitmap buffer
+	uint8_t* buffer = (uint8_t*)malloc(w * h * 2);
+	ptr = 0;
+	
 	for (int16_t j = 0; j < h; j++, y++)
 	{
 		for (int16_t i = 0; i < w; i++)
@@ -614,12 +626,22 @@ void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_
 			if (i & 7)
 				byte <<= 1;
 			else
-				byte = bitmap[j * byteWidth + i / 8];
-			TFTdrawPixel(x + i, y, (byte & 0x80) ? color : bgcolor);
+				byte = (pBmp[j * byteWidth + i / 8]);
+			mycolor = (byte & 0x80) ? color : bgcolor;
+			buffer[ptr++] = mycolor >> 8;
+			buffer[ptr++] = mycolor;
 		}
 	}
-}
+	// Set window and write buffer
+	y = temp_y;
+	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
+	TFT_DC_SetHigh;
+	if (_hardwareSPI == false){TFT_CS_SetLow;}
+	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
+	if (_hardwareSPI == false){TFT_CS_SetHigh;}
 
+	free(buffer);
+}
 
 // Desc: Draws an 24 bit color bitmap to screen
 // Param 1,2  X,Y screen co-ord
@@ -669,24 +691,39 @@ void ST7735_TFT_graphics ::TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, 
 // Param 1,2  X,Y screen co-ord
 // Param 3 A pointer to the databuffer containing Bitmap data
 // Param 4,5: width and height 0-127 possible values width and height of bitmap in pixels
-
+// Note as of version 1.4 uses spiWriteBuffer method
 void ST7735_TFT_graphics ::TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h) {
-	uint8_t i, j,temp;
+	uint8_t i, j;
 	uint16_t color;
-
+	uint32_t ptr;
+	
+	// Check bounds
+	if ((x >= _widthTFT) || (y >= _heightTFT)) return;
+	if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
+	if ((y + h - 1) >= _heightTFT) h = _heightTFT - y;
+	
+	// Create bitmap buffer
+	uint8_t* buffer = (uint8_t*)malloc(w * h * 2);
+	ptr = 0;
+	
 	for(j = 0; j < h; j++)
 	{
 		for(i = 0; i < w; i ++)
 		{
-			//Note:This code(next two lines) works too, left in for reference
-			//color = *(unsigned int*)(pBmp + i * 2 + j * 2 * w);
-			//TFTdrawPixel(x + i , y + h - 1 - j, color);
-			color= (*pBmp++);
-			temp = (*pBmp++);
-			color = (temp<<8)|color;
-			TFTdrawPixel(x+i, y + h -1 -j, color);
+			color = *(unsigned int*)(pBmp + i * 2 + (h-1-j) * 2 * w);
+			buffer[ptr++] = color >> 8;
+			buffer[ptr++] = color;
 		}
 	}
+	
+	// Set window and write buffer
+	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
+	TFT_DC_SetHigh;
+	if (_hardwareSPI == false){TFT_CS_SetLow;}
+	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
+	if (_hardwareSPI == false){TFT_CS_SetHigh;}
+
+	free(buffer);
 }
 
 // Desc: writes a char (c) on the TFT
@@ -839,10 +876,10 @@ void ST7735_TFT_graphics::spiWriteSoftware(uint8_t spidata) {
 		TFT_SDATA_SetLow;
 		if (spidata & 0x80)TFT_SDATA_SetHigh; // b1000000 Mask with 0 & all zeros out.
 		TFT_SCLK_SetHigh;
-		bcm2835_delayMicroseconds(TFT_HIGHFREQ_DELAY);
+		TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
 		spidata <<= 1;
 		TFT_SCLK_SetLow;
-		bcm2835_delayMicroseconds(TFT_HIGHFREQ_DELAY);
+		TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
 	}
 }
 

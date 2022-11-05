@@ -114,8 +114,10 @@
 #define TFT_SDATA_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SDATA, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_CS_SetDigitalOutput bcm2835_gpio_fsel(_TFT_CS, BCM2835_GPIO_FSEL_OUTP)
 
-#define TFT_HIGHFREQ_DELAY 0 //Software SPI delay
-
+// Delays
+#define TFT_MILLISEC_DELAY bcm2835_delay
+#define TFT_MICROSEC_DELAY bcm2835_delayMicroseconds
+#define TFT_HIGHFREQ_DELAY 0 // Optional Software SPI delay uS
 
 // Section: Enums
 

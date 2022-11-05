@@ -12,7 +12,7 @@
 	* Added "tiny" font 
 	* Extended default font data set to full ASCII range
 * Version 1.4 November 2022
-	* github Pull request #1 Separate Invert Control, SPI Clock Frequency Control, Buffered Writes
+	* github Pull request #1 merged , Separate Invert Control, SPI Clock Frequency Control, Buffered Writes
 		main:
 		* void TFTInitSPIClockFrequency(uint32_t hertz) - set the SPI clock frequency
 		* void TFTchangeInvertMode(bool invertModeOn) - set the invert mode separately from the driver mode
@@ -23,3 +23,6 @@
 		* void spiWriteBuffer(uint8_t* spidata, uint32_t len)  - write an array of bytes to SPI
 		* TFTfillRectangle - modified to use writeDataBuffer
 		* TFTdrawBitmap24 - modified to use writeDataBuffer 
+* Version 1.5 November 2022
+	* TFTdrawBitmap and TFTdrawBitmap16 modifed modified to use writeDataBuffer
+	* delay statements defined in library header file 

@@ -36,7 +36,9 @@ pre-build:
 	@echo "*****************"
 	@echo "[START!]"
 	@echo
+	@echo "[MAKE LIBRARY]"
 	$(MD) -vp $(OBJ)
+
 
 # Make the library
 ST7735_TFT_RPI: $(OBJS)
@@ -86,3 +88,4 @@ clean:
 	@echo "[CLEAN OBJECT FILES]"
 	rm -rvf $(OBJ)/*.o ${LIB}.*
 	@echo "[DONE!]"
+	@echo "******************"

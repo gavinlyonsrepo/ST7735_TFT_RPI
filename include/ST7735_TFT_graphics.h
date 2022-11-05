@@ -107,7 +107,7 @@ class ST7735_TFT_graphics : public Print {
 	
 	// Bitmap & Icon
 	void TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t color, uint16_t bgcolor, const unsigned char character[]);
-	void TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, const unsigned char bitmap[]);
+	void TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, uint8_t *pBmp);
 	void TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h);
 	void TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, char w, char h);
 	

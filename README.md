@@ -49,14 +49,14 @@ Installation
 	* Run following command to download from github.
 
 ```sh
-curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.4.tar.gz | tar xz
+curl -sL https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/archive/1.5.tar.gz | tar xz
 ```
 
 4. Install library. Run "make" to run the makefile to install library, it will be
     installed to usr/lib and usr/include
 
 ```sh
-cd ST7735_TFT_RPI-1.4
+cd ST7735_TFT_RPI-1.5
 sudo make
 ```
 
@@ -72,7 +72,7 @@ you should now see the test routines in that file running on the display. The ex
 ```sh
 cd example/
 make
-sudo bin/test
+make run
 ```
 
 
@@ -88,14 +88,14 @@ where user can make adjustments to select for SPI type used, PCB type used and s
 3. USER OPTION 3 PCB_TYPE
 4. USER OPTION 4 SPI SPEED
 
-**SPI TYPE / GPIO**
+**USER OPTION 1 SPI TYPE / GPIO**
 
 This library supports both Hardware SPI and software SPI.
 The parameters set for TFTSetupGPIO define which is used, by default its Hardware.
-to switch between the two: set SCLK SDIN and CS to -1 for Hardware SPI
-set thtme ot GPIO numbers for SW SPI
+to switch between the two: set SCLK, SDIN and CS to -1 for Hardware SPI
+set them to GPIO numbers for SW SPI.
 
-**Screen size  + Offsets**
+**USER OPTION 2 Screen size  + Offsets**
 
 In the main.cpp file, in USER OPTION 2 .
 User can adjust screen pixel height, screen pixel width and x & y screen offsets.
@@ -103,12 +103,12 @@ These offsets can be used in the event of screen damage or manufacturing errors 
 such as cropped data or defective pixels.
 The function TFTInitScreenSize sets them.
 
-**PCB Version**
+**USER OPTION 3 PCB Version**
 
 It should work in theory on other TFT displays using the different init functions, 
 but not tested. In the main.cpp in USER OPTION 3 PCB_TYPE select your PCB.
 By passing an enum type to function  TFTInitPCBType.
-Default is "TFT_ST7735S_Black". 
+Default is "TFT_ST7735R_Red". 
 
 There are 4 types of the ST7735 TFT display supported.
 | Number | Description | Enum label|
@@ -119,7 +119,8 @@ There are 4 types of the ST7735 TFT display supported.
 | 4 | ST7735S Black Tab | TFT_ST7735S_Black |
 
 
-**SPI SPEED** 
+**USER OPTION 4 SPI SPEED** 
+
 Here the user can pass the SPI Bus freq in Hertz,
 Maximum 125 Mhz , Minimum 30Khz, The default in file is 8Mhz 
 This option is optional if you don't call it Speed is set to bcm2835 
@@ -169,9 +170,6 @@ The large numerical Fonts, 6 & 7 cannot be scaled.
 **Bitmap**
 
 There are four functions to support drawing bitmaps
-Note: The library was developed on a
-TFT without built-in SD card feature, so no SD-card support
-in this library at present.
 
 | Function Name | Colour support | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |
