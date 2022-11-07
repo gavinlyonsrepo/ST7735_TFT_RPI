@@ -79,7 +79,7 @@ make run
 Software
 ----------------------
 
-In example/src/main.cpp file. There are three sections in "Setup()" function 
+In example/src/main.cpp file. There are 4 sections in "Setup()" function 
 where user can make adjustments to select for SPI type used, PCB type used and screen size.
 
 
@@ -199,7 +199,7 @@ Connections as setup in main.cpp test file.
 1. NOTE connect LED backlight pin 1 thru a 150R/220R ohm resistor to 3.3/5V VCC.
 2. This is a 3.3V logic device do NOT connect the I/O logic lines to 5V logic device.
 3. You can connect VCC to 5V if there is a 3.3 volt regulator on back of TFT module.
-4. Pick any GPIO you want for HW SPI for SW SPI: reset and DC lines are flexible.
+4. Pick any GPIO you want for SW SPI for HW SPI: reset and DC lines are flexible.
 
 ![ wiring ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/wiring.jpg)
 
