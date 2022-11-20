@@ -19,8 +19,8 @@ Overview
 
 0. C++ Library for a TFT SPI LCD, ST7735 Driver
 1. Dynamic install-able Raspberry Pi C++ library.
-2. Inverse colour, rotate, sleep, idle  & verticaly scroll modes supported.
-3. Seven fonts
+2. Inverse colour, rotate, sleep, idle  & vertical scroll modes supported.
+3. 8 fonts
 4. Graphics + print class included.
 5. 24 bit colour , 16 bit color & bi-color Bitmaps supported.
 6. Hardware and Software SPI
@@ -32,7 +32,7 @@ Overview
 * Developed on
     1. Raspberry PI 3 model b
     2. C++ g++ (Raspbian 8.3.0-6+rpi1) 8.3.0
-    3. Raspbian 10 stretch OS , armv7l Linux 5.10.63-v7
+    3. Raspbian 10 Buster OS , armv7l Linux 5.10.63-v7
     4. bcm2835 Library 1.68
 
 Installation
@@ -66,8 +66,8 @@ Test
 1. Next step is to test TFT and installed library with the included main.cpp test example file.
 Wire up your TFT. Next enter the example folder and run the makefile in THAT folder,
 This second makefile builds the examples file using the just installed library,
-and creates a test exe file in "bin". Be sure to use "sudo" as the bcm2835 requires root permissions by default [ see here for more details on that](http://www.airspayce.com/mikem/bcm2835/)
-you should now see the test routines in that file running on the display. The example file is setup by default fro a 128x128 red tab TFT.
+and creates a test exe file in "bin". Make run will use "sudo" as the bcm2835 requires root permissions by default [see here for details](http://www.airspayce.com/mikem/bcm2835/)
+you should now see the test routines in that file running on the display. The example file is setup by default for a 128x128 red tab TFT.
 
 ```sh
 cd example/
@@ -92,12 +92,11 @@ where user can make adjustments to select for SPI type used, PCB type used and s
 
 This library supports both Hardware SPI and software SPI.
 The parameters set for TFTSetupGPIO define which is used, by default its Hardware.
-to switch between the two: set SCLK, SDIN and CS to -1 for Hardware SPI
-set them to GPIO numbers for SW SPI.
+to switch between the two: set SCLK, SDIN and CS to -1 for HW SPI
+set them to valid GPIO numbers for SW SPI.
 
 **USER OPTION 2 Screen size  + Offsets**
 
-In the main.cpp file, in USER OPTION 2 .
 User can adjust screen pixel height, screen pixel width and x & y screen offsets.
 These offsets can be used in the event of screen damage or manufacturing errors around edge 
 such as cropped data or defective pixels.
@@ -109,10 +108,10 @@ TFTInitPCBType method
 
 1. Param1 PCB_TYPE
 
-It should work in theory on other TFT displays using the different init functions, 
-but not tested. In the main.cpp in USER OPTION 3 PCB_TYPE select your PCB.
+In the main.cpp in USER OPTION 3 PCB_TYPE select your PCB.
 By passing an enum type to function  TFTInitPCBType.
-Default is "TFT_ST7735R_Red". 
+It should work in theory on other TFT displays using the different init functions, 
+but not tested. Default is "TFT_ST7735R_Red". 
 
 There are 4 types of the ST7735 TFT display supported.
 | Number | Description | Enum label|
@@ -131,12 +130,9 @@ constant BCM2835_SPI_CLOCK_DIVIDER_32. If using SW spi, ignore.
 
 3. Param3 SPI_CE_PIN (HW SPI Only)
 
-Which Chipenable pin to use two choices.
+Which Chip enable pin to use two choices. If using SW spi, ignore.
 	* SPICE0 = 0
 	* SPICE1 = 1
-
-If using SW spi, ignore.
-
 
 
 **Tested** 
@@ -147,8 +143,7 @@ These two are only type of ST7735 library tested on, but should work on other ty
 2. TFT SPI LCD, ST7735 Driver, RED PCB v1.2, 1.8 , 128 x 160 pixels, "ST7735S Black Tab" 
 
 The test files and full screen bitmaps are set up for number 1.  so user will have to modify 
-"USER OPTIONS" in main.cpp..
-Backlight control is left to user.
+"USER OPTIONS" in main.cpp. 
 
 **Files**
 
@@ -167,10 +162,10 @@ There are two makefiles
 
 8 fonts available : 
 
-| Font num | Font name | Font size xbyy |  Note |
+|  num | name | size xbyy | ASCII range |
 | ------ | ------ | ------ | ------ |  
 | 1 | Default | 5x8 | Full Extended ASCII 0x00 - 0xFF |
-| 2 | Thick   | 7x8 | ASCII  0x20 - 0x5A  ,no lowercase letters |
+| 2 | Thick   | 7x8 | ASCII  0x20 - 0x5A  , no lowercase letters |
 | 3 | Seven segment | 4x8 | ASCII  0x20 - 0x7A |
 | 4 | Wide | 8x8 | ASCII 0x20 - 0x5A , no lowercase letters |
 | 5 | Tiny | 3x8 | ASCII  0x20 - 0x7A |
@@ -211,12 +206,13 @@ Connections as setup in main.cpp test file.
 | 7 | GND | GND | GND |
 | 8 | VCC | VCC | VCC  |
 
-1. NOTE connect LED backlight pin 1 thru a 150R/220R ohm resistor to 3.3/5V VCC.
+1. Connect LED backlight pin 1 thru a 150R/220R ohm resistor to 3.3/5V VCC.
 2. This is a 3.3V logic device do NOT connect the I/O logic lines to 5V logic device.
 3. You can connect VCC to 5V if there is a 3.3 volt regulator on back of TFT module.
 4. Pick any GPIO you want for SW SPI for HW SPI: reset and DC lines are flexible.
 5. User can select  SPI_CE0  or SPI_CE1 for HW SPI
 ![ wiring ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/wiring.jpg)
+6. Backlight control is left to user.
 
 Output
 -----------------------
@@ -227,7 +223,7 @@ Output of some of the test routine's. Left to right, top to bottom.
 2. Different sizes of default font. Size 2 3 4 & 5 shown.
 3. Different Fonts at font size 2, fonts 1-5. Are these fonts are scale-able, font 6 not shown.
 4. Shapes
-5. More Shapes
+5. More Shapes!
 6. Bitmap (bi-color) A background and a foreground.
 7. Clock Demo showing icons, small bitmaps and font 7 "BigNums"
 8. 24-bit color bitmap test image
