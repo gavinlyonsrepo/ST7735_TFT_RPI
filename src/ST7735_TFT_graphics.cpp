@@ -889,10 +889,10 @@ void ST7735_TFT_graphics::spiWriteSoftware(uint8_t spidata) {
 		TFT_SDATA_SetLow;
 		if (spidata & 0x80)TFT_SDATA_SetHigh; // b1000000 Mask with 0 & all zeros out.
 		TFT_SCLK_SetHigh;
-		if (TFT_HIGHFREQ_DELAY > 0) TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
+		TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
 		spidata <<= 1;
 		TFT_SCLK_SetLow;
-		if (TFT_HIGHFREQ_DELAY > 0) TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
+		TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
 	}
 }
 

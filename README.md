@@ -83,7 +83,7 @@ In example/src/main.cpp file. There are 3 sections in "Setup()" function
 where user can make adjustments to select for SPI type used, PCB type used and screen size.
 
 
-1. USER OPTION 1 SPI/GPIO TYPE
+1. USER OPTION 1 GPIO/SPI TYPE
 2. USER OPTION 2 SCREEN SECTION 
 3. USER OPTION 3 PCB_TYPE, SPI SPEED , SPI_CE_PIN
 
@@ -93,7 +93,12 @@ where user can make adjustments to select for SPI type used, PCB type used and s
 This library supports both Hardware SPI and software SPI.
 The parameters set for TFTSetupGPIO define which is used, by default its Hardware.
 to switch between the two: set SCLK, SDIN and CS to -1 for HW SPI
-set them to valid GPIO numbers for SW SPI.
+set them to valid GPIO numbers for SW SPI. HW SPI is far faster and more reliable than SW SPI
+If user is having reliability issues with SW SPI in some setups. The user can adjust 
+the TFT_HIGHFREQ_DELAY setting in ST7735_TFT.h file, this is a microsecond
+delay in SW SPI loop. It is set to 0 by default, Increasing it will slow 
+down SW SPI further.
+
 
 **USER OPTION 2 Screen size  + Offsets**
 
