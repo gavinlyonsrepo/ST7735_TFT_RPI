@@ -1,5 +1,5 @@
 /*
- * Project Name: ST7735, 128 by 128, 1.44", red pcb,SPI TFT module, lib
+ * Project Name: ST7735,
  * File: ST7735_TFT.h
  * Description: library header file
  * Author: Gavin Lyons.
@@ -12,7 +12,7 @@
 
 // Section Libraries 
 #include <bcm2835.h>
-#include <stdio.h>
+#include <iostream>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -95,13 +95,14 @@
 #define   ST7735_TAN     0xED01
 #define   ST7735_GREY    0x9CD1
 #define   ST7735_BROWN   0x6201
+#define   ST7735_ORANGE  0xFC00
 
 // GPIO
 #define TFT_DC_SetHigh  bcm2835_gpio_write(_TFT_DC, HIGH)
 #define TFT_DC_SetLow  bcm2835_gpio_write(_TFT_DC, LOW)
 #define TFT_RST_SetHigh  bcm2835_gpio_write(_TFT_RST, HIGH)
 #define TFT_RST_SetLow  bcm2835_gpio_write(_TFT_RST, LOW)
-#define TFT_CS_SetHigh bcm2835_gpio_write(_TFT_CS, HIGH) // SW SPI last 6 lines
+#define TFT_CS_SetHigh bcm2835_gpio_write(_TFT_CS, HIGH) 
 #define TFT_CS_SetLow bcm2835_gpio_write(_TFT_CS, LOW)
 #define TFT_SCLK_SetHigh bcm2835_gpio_write(_TFT_SCLK, HIGH)
 #define TFT_SCLK_SetLow  bcm2835_gpio_write(_TFT_SCLK, LOW)
@@ -110,7 +111,7 @@
 
 #define TFT_DC_SetDigitalOutput bcm2835_gpio_fsel(_TFT_DC, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_RST_SetDigitalOutput bcm2835_gpio_fsel(_TFT_RST, BCM2835_GPIO_FSEL_OUTP)
-#define TFT_SCLK_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SCLK, BCM2835_GPIO_FSEL_OUTP) // SW SPI last 3 lines
+#define TFT_SCLK_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SCLK, BCM2835_GPIO_FSEL_OUTP) 
 #define TFT_SDATA_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SDATA, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_CS_SetDigitalOutput bcm2835_gpio_fsel(_TFT_CS, BCM2835_GPIO_FSEL_OUTP)
 
@@ -160,8 +161,7 @@ public:
 	
 	void TFTSetupGPIO(int8_t, int8_t, int8_t, int8_t, int8_t);
 	void TFTInitScreenSize(uint8_t xOffset, uint8_t yOffset, uint16_t w, uint16_t h);
-	void TFTInitPCBType(TFT_PCBtype_e);
-	void TFTInitSPIClockFrequency(uint32_t hertz);
+	int8_t TFTInitPCBType(TFT_PCBtype_e p, uint32_t hertz = 0, uint8_t SPICE_Pin = 0 );
 	void TFTPowerDown(void);
 	
 	void TFTsetRotation(TFT_rotate_e r);
@@ -185,6 +185,8 @@ private:
 	void Rcmd2green(void);
 	
 	uint8_t  _rotation = 0; 
+	uint32_t _hertz; // Spi freq in Hertz , MAX 125 Mhz MIN 30Khz
+	uint8_t  _SPICEX_pin; // value = X , which SPI_CE pin to use 
 
 }; //end of class
 

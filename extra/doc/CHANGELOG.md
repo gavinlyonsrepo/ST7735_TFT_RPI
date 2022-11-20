@@ -24,5 +24,11 @@
 		* TFTfillRectangle - modified to use writeDataBuffer
 		* TFTdrawBitmap24 - modified to use writeDataBuffer 
 * Version 1.5 November 2022
-	* TFTdrawBitmap and TFTdrawBitmap16 modifed modified to use writeDataBuffer
-	* delay statements defined in library header file 
+	* methods TFTdrawBitmap and TFTdrawBitmap16 modified to use writeDataBuffer
+	* delay statements defined in library header file
+	* added font "homespun"
+	* merged method "TFTInitSPIClockFrequency" with "TFTInitPCBType" and 
+		added option to select chip enable line(0 or 1)
+	* methods spiWriteBuffer & writeDataBuffer merged to single method spiWriteDataBuffer
+	* replaced printf with cout
+	

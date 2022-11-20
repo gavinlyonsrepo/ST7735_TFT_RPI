@@ -5,15 +5,13 @@
  * Author: Gavin Lyons.
  * Created May 2021
  * Description: See URL for full details.
- * NOTE :: USER OPTIONS 1-4 in SETUP function
+ * NOTE :: USER OPTIONS 1-3 in SETUP function
  * URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
  */
 
 // Section ::  libraries 
 #include <bcm2835.h> // for SPI GPIO and delays.
-#include <stdio.h> // for printf
 #include <time.h> // for test 11 & FPS
-
 #include "ST7735_TFT.h"
 #include "Bi_Color_Bitmap.h" // Data for test 11 and 12.
 
@@ -30,13 +28,13 @@ bool bTestFPS = false; // Optional ,runs FPS test at end if true.
 
 //  Section ::  Function Headers 
 
-void Setup(void);  // setup + user options
-void Test0(void);  // Print out all fonts 1-5
+int8_t Setup(void);  // setup + user options
+void Test0(void);  // Print out all fonts 1-6
 void Test1A(void); // defined 16-bit Colors, text
 void Test1B(void); // print entire ASCII font 0 to 127, default font
 void Test1C(void); // print numbers int and float using draw functions
 void Test1D(void); // print numbers int and float using PRINT function
-void Test1E(void); // Print out font 6 & 7 using draw functions
+void Test1E(void); // Print out font 7-8 using draw functions
 void Test2(void);  // font sizes(1-4) + character draw using draw functions
 void Test3(void);  // pixels and lines
 void Test4(void);  // rectangles 
@@ -46,11 +44,11 @@ void Test7(void);  // scroll
 void Test8(void);  // More shapes, media buttons graphic.
 void Test9(void);  // Rotate
 void Test10(void); // change modes test -> Invert, display on/off and Sleep.
-void Test11(void); // "clock demo" icons, small bi-color bitmaps, font 6 & 7
+void Test11(void); // "clock demo" icons, small bi-color bitmaps, font 7-8
 void Test12(void); // 2 color bitmap
 void Test14(void); // 24 color bitmap
 void Test15(void); // 16 color bitmap 
-void TestFPS(void); // Frames per second 24 color bitmap test, optional
+void TestFPS(void); // Frames per second 24 color bitmap test, optional(bTestFPS)
 void EndTests(void);
 
 int64_t getTime(); // Utility for FPS test
@@ -60,14 +58,8 @@ uint8_t* loadImage(char* name); // Utility for FPS test
 
 int main(void) 
 {
-	if(!bcm2835_init())
-	{
-		printf("Error 1201 : Problem with init bcm2835 library\r\n");
-		return -1;
-	}
-	
-	Setup();
 
+	if(!Setup())return -1;
 	Test0();
 	Test1A();
 	Test1B();
@@ -88,7 +80,6 @@ int main(void)
 	Test14();
 	Test15();
 	if (bTestFPS == true) TestFPS();
-
 	EndTests();
 	return 0;
 }
@@ -97,41 +88,43 @@ int main(void)
 
 //  Section ::  Function Space 
 
-void Setup(void)
+int8_t Setup(void)
 {
 
 	TFT_MILLISEC_DELAY(TEST_DELAY1);
-	printf("TFT Start\r\n");
+	std::cout << "TFT Start!" << std::endl;
+	if(!bcm2835_init())
+	{
+		std::cout << "Error : Problem with init bcm2835 library" << std::endl;
+		return -1;
+	}
 	
-// ******** USER OPTION 2 GPIO/SPI TYPE HW OR SW *********
+// ** USER OPTION 1 GPIO/SPI TYPE HW OR SW **
 	int8_t RST_TFT = 25;
 	int8_t DC_TFT = 24;
-	int8_t SCLK_TFT = -1; // 11, change to GPIO no for sw spi, -1 hw spi
-	int8_t SDIN_TFT = -1; // 10, change to GPIO no for sw spi, -1 hw spi
+	int8_t SCLK_TFT = -1; // 5, change to GPIO no for sw spi, -1 hw spi
+	int8_t SDIN_TFT = -1; // 6, change to GPIO no for sw spi, -1 hw spi
 	int8_t CS_TFT = -1 ;  // 8, change to GPIO no for sw spi, -1 hw spi
-//**********************************************************
+	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT, CS_TFT, SCLK_TFT, SDIN_TFT);
+//*********************************************
 
-// ****** USER OPTION 2 Screen Setup ****** 
+// ** USER OPTION 2 Screen Setup **
 	uint8_t OFFSET_COL = 0;  // 2, These offsets can be adjusted for any issues->
 	uint8_t OFFSET_ROW = 0; // 3, with manufacture tolerance/defects
 	uint16_t TFT_WIDTH = 128;// Screen width in pixels
 	uint16_t TFT_HEIGHT = 128; // Screen height in pixels
-// ******************************************
-
-	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT, CS_TFT, SCLK_TFT, SDIN_TFT);
 	myTFT.TFTInitScreenSize(OFFSET_COL, OFFSET_ROW , TFT_WIDTH , TFT_HEIGHT);
+// ***********************************
 
-// ******** USER OPTION 3 PCB_TYPE **************************
-	myTFT.TFTInitPCBType(TFT_ST7735R_Red); // pass enum,4 choices,see README
-//**********************************************************
-
-//*************** USER OPTION 4 SPI_SPEED ***********
-	uint32_t SCLK_FREQ =  8000000 ; // Spi freq in Hertz , MAX 125 Mhz MIN 30Khz
-	myTFT.TFTInitSPIClockFrequency(SCLK_FREQ); // optional, default is 12.5MHz
-//**********************************************************
-	
-	//myTFT.TFTsetRotation(TFT_Degress_270);
-	//myTFT.TFTchangeInvertMode(true);
+//
+// ** USER OPTION 3 PCB_TYPE + SPI baud rate + SPI_CE_PIN**
+	uint32_t SCLK_FREQ =  8000000 ; // HW Spi freq in Hertz , MAX 125 Mhz MIN 30Khz
+	uint8_t SPI_CE_PIN = 0; // which HW SPI chip enable pin to use,  0 or 1
+	// pass enum to param1 ,4 choices,see README
+	if(!myTFT.TFTInitPCBType(TFT_ST7735R_Red, SCLK_FREQ, SPI_CE_PIN))return -1;
+	// Note : if using SW SPI you do not have to pass anything for param 2&3, it will do nothing. 
+//*****************************
+	return 0;
 }
 
 void Test0(void) {
@@ -141,19 +134,22 @@ void Test0(void) {
 	char teststr3[] = "Seven 3";
 	char teststr4[] = "WIDE 4";
 	char teststr5[] = "Tiny 5";
+	char teststr6[] = "Home 6";
 	
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	
 	myTFT.TFTFontNum(TFTFont_Default);
-	myTFT.TFTdrawText(0, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
+	myTFT.TFTdrawText(0, 4, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
 	myTFT.TFTFontNum(TFTFont_Thick);
-	myTFT.TFTdrawText(0, 35, teststr2, ST7735_GREEN, ST7735_BLACK, 2);
+	myTFT.TFTdrawText(0, 20, teststr2, ST7735_GREEN, ST7735_BLACK, 2);
 	myTFT.TFTFontNum(TFTFont_Seven_Seg);
-	myTFT.TFTdrawText(0, 55, teststr3, ST7735_BLUE, ST7735_BLACK, 2);
+	myTFT.TFTdrawText(0, 36, teststr3, ST7735_BLUE, ST7735_BLACK, 2);
 	myTFT.TFTFontNum(TFTFont_Wide);
-	myTFT.TFTdrawText(0, 75, teststr4, ST7735_CYAN, ST7735_BLACK, 2);
+	myTFT.TFTdrawText(0, 52, teststr4, ST7735_CYAN, ST7735_BLACK, 2);
 	myTFT.TFTFontNum(TFTFont_Tiny);
-	myTFT.TFTdrawText(0, 100, teststr5, ST7735_RED, ST7735_BLACK, 2);
+	myTFT.TFTdrawText(0, 68, teststr5, ST7735_RED, ST7735_BLACK, 2);
+	myTFT.TFTFontNum(TFTFont_HomeSpun);
+	myTFT.TFTdrawText(0, 84, teststr6, ST7735_YELLOW, ST7735_BLACK, 2);
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	myTFT.TFTFontNum(TFTFont_Default);
@@ -170,35 +166,48 @@ void Test1A(void) {
 	char teststr8[] = "GREY";
 	char teststr9[] = "TAN";
 	char teststr10[] = "BROWN";
-	myTFT.TFTdrawText(0, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 15, teststr2, ST7735_BLUE, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 25, teststr3, ST7735_RED, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 35, teststr4, ST7735_GREEN, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 45, teststr5, ST7735_CYAN, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 55, teststr6, ST7735_MAGENTA, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 65, teststr7, ST7735_YELLOW, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 75, teststr1, ST7735_WHITE, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 85, teststr8, ST7735_GREY, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 95, teststr9, ST7735_TAN, ST7735_BLACK, 1);
-	myTFT.TFTdrawText(0, 105, teststr10 , ST7735_BROWN, ST7735_BLACK, 1);
+	char teststr11[] = "ORANGE";
+	myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 15, teststr2, ST7735_BLUE, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 25, teststr3, ST7735_RED, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 35, teststr4, ST7735_GREEN, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 45, teststr5, ST7735_CYAN, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 55, teststr6, ST7735_MAGENTA, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 65, teststr7, ST7735_YELLOW, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 75, teststr8, ST7735_GREY, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 85, teststr9, ST7735_TAN, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 95, teststr10 , ST7735_BROWN, ST7735_BLACK, 1);
+	myTFT.TFTdrawText(5, 105, teststr11 , ST7735_ORANGE, ST7735_BLACK, 1);
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
 void Test1B(void) {
 	uint8_t row = 5;
-	uint8_t col = 0;
+	uint8_t col = 5;
 	for (char i = 0; i < 126; i++) {
 		
 		myTFT.TFTdrawChar(col, row, i, ST7735_GREEN, ST7735_BLACK, 1);
 		col += 10;
-		if (col > 100) {
+		if (col > 115) {
 			row += 10;
-			col = 0;
+			col = 5;
 		}
-		TFT_MILLISEC_DELAY(20);
 	}
-
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	myTFT.TFTfillScreen(ST7735_BLACK);
+	
+	row = 5;
+	col = 5;
+	for (unsigned char j = 127; j < 254; j++) {
+		
+		myTFT.TFTdrawChar(col, row, j, ST7735_GREEN, ST7735_BLACK, 1);
+		col += 10;
+		if (col > 115) {
+			row += 10;
+			col = 5;
+		}
+	}
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 }
@@ -212,14 +221,14 @@ void Test1C(void)
 	sprintf(myStr, "%d", myInt);
 	myTFT.TFTdrawText(5, 5, myStr, ST7735_BLUE, ST7735_BLACK, 3);
 
-	float  myPI = 3.141592;
+	float  myPI = 3.171592;
 	char myStr2[8];
-	sprintf(myStr2, "%0.3f", myPI);
+	sprintf(myStr2, "%0.3f", myPI); // 3.172
 	myTFT.TFTdrawText(5, 65, myStr2, ST7735_RED, ST7735_BLACK, 3);
 	
 	TFT_MILLISEC_DELAY(TEST_DELAY2);
 	myTFT.TFTfillScreen(ST7735_BLACK);
-		
+
 }
 
 
@@ -234,17 +243,17 @@ void Test1D(void){
 	myTFT.TFTsetCursor(50,10); // Test a int with print 
 	myTFT.print(1243);
 	
-	// Test a int with print inverted size 2
+	// Test a -int with print inverted size 2
 	myTFT.setTextSize(2);
 	myTFT.setTextColor(ST7735_RED, ST7735_YELLOW);
-	myTFT.TFTfillRectangle(5, 25, 120, 20, ST7735_YELLOW);
+	myTFT.TFTfillRectangle(5, 23, 120, 17, ST7735_YELLOW);
 	myTFT.TFTsetCursor(5,25);
 	myTFT.TFTFontNum(TFTFont_Seven_Seg);
-	myTFT.print(492);
+	myTFT.print(-49);
 	
 	myTFT.TFTsetCursor(45,25); // Test a float 
 	myTFT.TFTFontNum(TFTFont_Wide);
-	myTFT.print(3.14);
+	myTFT.print(3.1745, 1); // print 3.2
 	
 	myTFT.TFTsetCursor(10,55); // Test float bignum font
 	myTFT.TFTFontNum(TFTFont_Bignum);
@@ -257,11 +266,26 @@ void Test1D(void){
 	
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
+	
+	// Test print with DEC BIN OCT HEX 
+	uint8_t numPos = 47;
+	myTFT.TFTFontNum(TFTFont_HomeSpun);
+	myTFT.TFTsetCursor(5,5); 
+	myTFT.print(numPos , DEC); // 47
+	myTFT.TFTsetCursor(5,25); 
+	myTFT.print(numPos , BIN); // 10111
+	myTFT.TFTsetCursor(5,45); 
+	myTFT.print(numPos , OCT); // 57
+	myTFT.TFTsetCursor(5,65); 
+	myTFT.print(numPos , HEX); // 2F
+	
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
 void Test1E(void)
 {
-	// Note fonts 6 and 7 are numbers only + : 
+	// Note fonts 7 and 8 are numbers only + : 
 	char teststr1[] = "12:81";
 	char teststr2[] = "72:83";
 	
@@ -341,13 +365,12 @@ void Test7(void)
 	uint8_t pos = LINE_OFFSET;
 	for (uint8_t i = 0; i < LINES; i++) 
 	{
-	for (uint8_t j = 0; j < LINE_SIZE; j++) 
-	{
-		myTFT.TFTVerticalScroll(pos + TOP_FIXED);
-		pos++;
-		// check pos if necessary: must be < tftTFT_HEIGHT - TOP_FIXED - BOTTOM_FIXED
-		TFT_MILLISEC_DELAY(20);  
-	}
+		for (uint8_t j = 0; j < LINE_SIZE; j++) 
+		{
+			myTFT.TFTVerticalScroll(pos + TOP_FIXED);
+			pos++;
+			// check pos if necessary: must be < tftTFT_HEIGHT - TOP_FIXED - BOTTOM_FIXED 
+		}
 	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	}
 	myTFT.TFTchangeMode(TFT_Normal_mode); 
@@ -364,10 +387,10 @@ void Test8()
 	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	
 	// change play color
-	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_BLUE);
+	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_GREEN);
 	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	// change play color
-	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_GREEN);
+	myTFT.TFTfillTriangle(42, 20, 42, 60, 90, 40, ST7735_BLUE);
 	TFT_MILLISEC_DELAY(TEST_DELAY1);
 }
 
@@ -472,71 +495,63 @@ void Test11(void)
 
 void Test12(void)
 {
-myTFT.TFTfillScreen(ST7735_BLACK);
-char teststr1[] = "Bitmap 2 ";
-myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
-TFT_MILLISEC_DELAY(TEST_DELAY2);
-
-myTFT.TFTdrawBitmap(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, backupMenuBitmap);
-TFT_MILLISEC_DELAY(TEST_DELAY5);
+	myTFT.TFTfillScreen(ST7735_BLACK);
+	char teststr1[] = "Bitmap 2 ";
+	myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
+	TFT_MILLISEC_DELAY(TEST_DELAY2);
+	myTFT.TFTdrawBitmap(0, 0, 128 , 128, ST7735_WHITE , ST7735_GREEN, backupMenuBitmap);
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
 }
 
-// All files Windows BITMAPINFOHEADER offset 54
+// bitmap 24 colour , All files format = Windows BITMAPINFOHEADER offset 54
 void Test14(void)
 {
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	char teststr1[] = "Bitmap 24";
 	myTFT.TFTdrawText(5, 5, teststr1, ST7735_WHITE, ST7735_BLACK, 2);
-	TFT_MILLISEC_DELAY(TEST_DELAY2);
+	TFT_MILLISEC_DELAY(TEST_DELAY1);
 	
 	FILE *pFile ;
-	
 	size_t pixelSize = 3;
-	unsigned char bmpBuffer[(128 * 128) * pixelSize ];
-	
-	pFile = fopen("bitmap/24pic1.bmp", "r");
-	if (pFile == NULL) 
+	uint8_t* bmpBuffer = NULL;
+	bmpBuffer = (uint8_t*)malloc((128 * 128) * pixelSize);
+	if (bmpBuffer == NULL)
 	{
-		printf("File does not exist\n");
+		std::cout << "Error Test14 : MALLOC could not assign memory " << std::endl;
 		return;
 	}
-	fseek(pFile, 54, 0);
-	fread(bmpBuffer, pixelSize, 128 * 128, pFile);
-	fclose(pFile);
+	for (uint8_t i = 0 ; i < 3 ; i++)
+	{
+		switch (i) // select file
+		{
+			case 0: pFile = fopen("bitmap/bitmap24images/24pic1.bmp", "r"); break;
+			case 1: pFile = fopen("bitmap/bitmap24images/24pic2.bmp", "r"); break;
+			case 2: pFile = fopen("bitmap/bitmap24images/24pic3.bmp", "r"); break;
+		}
+		
+		if (pFile == NULL)  // Check file exists
+		{
+			std::cout << "Error Test14: File does not exist" << std::endl;
+			return;
+		}
+		
+		fseek(pFile, 54, 0); // Put file in Buffer
+		fread(bmpBuffer, pixelSize, 128 * 128, pFile);
+		fclose(pFile);
 
-	myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128);
-
-	TFT_MILLISEC_DELAY(TEST_DELAY5);
-	
-	pFile = fopen("bitmap/24pic2.bmp", "r");
-	if (pFile == NULL) {
-		printf("File does not exist\n");
-		return;
+		myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128); 
+		TFT_MILLISEC_DELAY(TEST_DELAY5);
 	}
-	fseek(pFile, 54, 0);
-	fread(bmpBuffer, pixelSize, 128 * 128, pFile);
-	fclose(pFile);
-
-	myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128);
-
-	TFT_MILLISEC_DELAY(TEST_DELAY5);
-	
-	pFile = fopen("bitmap/24pic3.bmp", "r");
-	if (pFile == NULL) {
-		printf("File does not exist\n");
-		return;
-	}
-	fseek(pFile, 54, 0);
-	fread(bmpBuffer, pixelSize, 128 * 128, pFile);
-	fclose(pFile);
-
-	myTFT.TFTdrawBitmap24(0, 0, bmpBuffer, 128, 128);
-	
-	TFT_MILLISEC_DELAY(TEST_DELAY5);
-	myTFT.TFTfillScreen(ST7735_BLACK);
-	
+	free(bmpBuffer);  // Free Up Buffer
 }
 
+// test function for 16 bit color bitmaps made in GIMP (RGB 565 16 bit color) 
+// 3 files 
+// File 1 16pic1.bmp BITMAPV5HEADER offset 132
+// Color space information written 
+// File 2&3 16pic2.bmp & 16pic3.bmp 
+// OS/2 OS22XBITMAPHEADER (BITMAPINFOHEADER2) offset 72
+// NO color space information written 
 
 void Test15(void)
 {
@@ -547,55 +562,44 @@ void Test15(void)
 	
 	FILE *pFile ;
 	size_t pixelSize = 2;
-	unsigned char bmpBuffer1[(128 * 128) * pixelSize ];
+	uint8_t offsetBMPHeader = 0;
+	uint8_t* bmpBuffer1 = NULL;
+	bmpBuffer1 = (uint8_t*)malloc((128 * 128) * pixelSize);
 	
-	// File 1  BITMAPV5HEADER offset 132
-	// made in GIMP , Color space information written 
-	// RGB 565 16 bit color
-	pFile = fopen("bitmap/16pic1.bmp", "r");
-	if (pFile == NULL) {
-		printf("File does not exist\n");
+	if (bmpBuffer1 == NULL)
+	{
+		std::cout << "Error Test15 : MALLOC could not assign memory " << std::endl;
 		return;
 	}
-	fseek(pFile, 132, 0);
-	fread(bmpBuffer1, pixelSize, 128 * 128, pFile);
-	fclose(pFile);
-	myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
 	
-	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	for (uint8_t i = 0 ; i < 3 ; i++)
+	{
+		switch (i) // select file
+		{
+			case 0: 
+				pFile = fopen("bitmap/bitmap16images/16pic1.bmp", "r"); 
+				offsetBMPHeader = 132;
+			break;
+			case 1: pFile = fopen("bitmap/bitmap16images/16pic2.bmp", "r"); break;
+			case 2: pFile = fopen("bitmap/bitmap16images/16pic3.bmp", "r"); break;
+		}
+		if (pFile == NULL) 
+		{
+			std::cout << "Error Test15 : File does not exist" << std::endl;
+			return;
+		}
+		fseek(pFile, offsetBMPHeader, 0);
+		fread(bmpBuffer1, pixelSize, 128 * 128, pFile);
+		fclose(pFile);
+		
+		myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
+		TFT_MILLISEC_DELAY(TEST_DELAY5);
+		offsetBMPHeader = 72;
+	} // end of for loop
 	
-	// file 2 OS/2 OS22XBITMAPHEADER (BITMAPINFOHEADER2) offset 72
-	// made in GIMP Color,  NO color space information written 
-	// RGB 565 16 bit color
-	pFile = fopen("bitmap/16pic2.bmp", "r");
-	if (pFile == NULL) {
-		printf("File does not exist\n");
-		return;
-	}
-	fseek(pFile, 72, 0);
-	fread(bmpBuffer1, pixelSize, 128 * 128, pFile);
-	fclose(pFile);
-	myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
-	
-	TFT_MILLISEC_DELAY(TEST_DELAY5);
-	
-	// file 3 OS/2 OS22XBITMAPHEADER (BITMAPINFOHEADER2) offset 72
-	// made in GIMP Color NO color space information written 
-	// RGB 565 16 bit color
-	pFile = fopen("bitmap/16pic3.bmp", "r");
-	if (pFile == NULL) {
-		printf("File does not exist\n");
-		return;
-	}
-	fseek(pFile, 72, 0);
-	fread(bmpBuffer1, pixelSize, 128 * 128, pFile);
-	fclose(pFile);
-	myTFT.TFTdrawBitmap16(0, 0, bmpBuffer1, 128, 128);
-	
-	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	free(bmpBuffer1); // Free Up Buffer
 	myTFT.TFTfillScreen(ST7735_BLACK);
-	
-}
+} // end of test 15
 
 void TestFPS(void) {
 	// Clear The Screen
@@ -603,13 +607,20 @@ void TestFPS(void) {
 
 	// Load images into buffers
 	uint8_t* img[5] = { 
-		loadImage((char*)"bitmap/title.bmp"),
-		loadImage((char*)"bitmap/menu.bmp"),
-		loadImage((char*)"bitmap/game1.bmp"),
-		loadImage((char*)"bitmap/game2.bmp"),
-		loadImage((char*)"bitmap/game3.bmp")
+		loadImage((char*)"bitmap/bitmapFPSimages/title.bmp"),
+		loadImage((char*)"bitmap/bitmapFPSimages/menu.bmp"),
+		loadImage((char*)"bitmap/bitmapFPSimages/game1.bmp"),
+		loadImage((char*)"bitmap/bitmapFPSimages/game2.bmp"),
+		loadImage((char*)"bitmap/bitmapFPSimages/game3.bmp")
 	};
-
+	for (uint8_t i=0; i<5 ;i++) // Did any loadImage call return NULL
+	{
+		if (img[i] == NULL){ 
+			for(uint8_t j=0; j<5; j++) free(img[j]); // Free Up Buffer if set
+			TFT_MILLISEC_DELAY(TEST_DELAY1);
+			return;
+		}
+	}
 	int64_t start = getTime(), duration = 0;
 	uint32_t frames = 0;
 	double fps = 0;
@@ -622,14 +633,14 @@ void TestFPS(void) {
 
 		if((++frames % 50) == 0) {
 			fps = (double)frames / ((double)duration / 1000000);
-			printf("%.2ffps\n", fps);
+			std::cout << fps << std::endl;
 		}
 	}
 
 	// Get final Stats and print
 	duration = getTime() - start;
 	fps = (double)frames / ((double)duration / 1000000);
-	printf("%d frames, %lld sec, %.2f fps\n", frames, duration / 1000000, fps);
+	std::cout << frames << " frames, " << duration / 1000000 << " sec, " << fps << " fps" << std::endl;
 
 	// Free Up Buffers
 	for(int i=0; i<5; i++) free(img[i]);
@@ -644,7 +655,7 @@ void EndTests(void)
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTPowerDown(); // Power down device
 	bcm2835_close(); // Close the bcm2835 library
-	printf("TFT End\r\n");
+	std::cout << "TFT End" << std::endl;
 }
 
 int64_t getTime() {
@@ -663,9 +674,15 @@ uint8_t* loadImage(char* name) {
 
 	pFile = fopen(name, "r");
 	if (pFile == NULL) {
-		printf("File does not exist\n");
+		std::cout << "Error TestFPS : File does not exist" << std::endl;
+		return NULL;
 	} else {
 		bmpBuffer1 = (uint8_t*)malloc((160 * 80) * pixelSize);
+		if (bmpBuffer1 == NULL)
+		{
+			std::cout << "Error TestFPS : MALLOC could not assign memory " << std::endl;
+			return NULL;
+		}
 		fseek(pFile, 132, 0);
 		fread(bmpBuffer1, pixelSize, 160 * 80, pFile);
 		fclose(pFile);

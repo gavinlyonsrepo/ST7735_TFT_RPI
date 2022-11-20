@@ -1,5 +1,5 @@
 /*
- * Project Name: ST7735, 128 by 128, 1.44", red pcb,  SPI TFT module
+ * Project Name: ST7735, 
  * File: ST7735_TFT.cpp
  * Description: library source file
  * Author: Gavin Lyons.
@@ -19,12 +19,24 @@ ST7735_TFT :: ST7735_TFT()
 void ST7735_TFT::TFTSPIInitialize(void)
 {
 	bcm2835_spi_begin();
+	
 	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
 	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-	//SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
-	bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32); 
-	bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
-	bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
+	
+	if (_hertz > 0)
+		bcm2835_spi_setClockDivider(bcm2835_aux_spi_CalcClockDivider(_hertz));
+	else //SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
+		bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32); 
+	
+	if (_SPICEX_pin == 0)
+	{
+		bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
+		bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);
+	}else if (_SPICEX_pin == 1)
+	{
+		bcm2835_spi_chipSelect(BCM2835_SPI_CS1);
+		bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS1, LOW);
+	}
 }
 
 
@@ -109,16 +121,12 @@ if (_hardwareSPI == false){
 // Desc: init sub-routine ST7735R Green Tab
 
 void ST7735_TFT ::Rcmd2green() {
+	uint8_t seq1[] {0x00, 0x02, 0x00, (0x7F + 0x02)}; 
+	uint8_t seq2[] {0x00, 0x01, 0x00, (0x9F + 0x01)}; 
 	writeCommand(ST7735_CASET);
-	writeData(0x00);
-	writeData(0x02);
-	writeData(0x00);
-	writeData(0x7F + 0x02);
+	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_RASET);
-	writeData(0x00);
-	writeData(0x01);
-	writeData(0x00);
-	writeData(0x9F + 0x01);
+	spiWriteDataBuffer(seq2, sizeof(seq2));
 }
 
 
@@ -196,6 +204,10 @@ if (_hardwareSPI == false)
 // Desc: init routine for ST7735B controller
 
 void ST7735_TFT ::Bcmd() {
+	uint8_t seq6[] {0x09, 0x16, 0x09, 0x20, 0x21, 0x1B, 0x13, 0x19, 0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E}; 
+	uint8_t seq7[] {0x0B, 0x14, 0x08, 0x1E, 0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F}; 
+	uint8_t seq8[] {0x00, 0x02, 0x08 , 0x81}; 
+	uint8_t seq9[] {0x00, 0x01, 0x08 , 0xA0}; 
 	writeCommand(ST7735_SWRESET);
 	TFT_MILLISEC_DELAY(50);
 	writeCommand(ST7735_SLPOUT);
@@ -232,22 +244,14 @@ void ST7735_TFT ::Bcmd() {
 	writeData(0x11);
 	writeData(0x15);
 	writeCommand(ST7735_GMCTRP1);
-	static uint8_t seq6[] {0x09, 0x16, 0x09, 0x20, 0x21, 0x1B, 0x13, 0x19, 0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E}; 
-	writeDataBuffer(seq6, sizeof(seq6));
+	spiWriteDataBuffer(seq6, sizeof(seq6));
 	writeCommand(ST7735_GMCTRN1);
-	static uint8_t seq7[] {0x0B, 0x14, 0x08, 0x1E, 0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F}; 
-	writeDataBuffer(seq7, sizeof(seq7));
+	spiWriteDataBuffer(seq7, sizeof(seq7));
 	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_CASET);
-	writeData(0x00);
-	writeData(0x02);
-	writeData(0x08);
-	writeData(0x81);
+	spiWriteDataBuffer(seq8, sizeof(seq8));
 	writeCommand(ST7735_RASET);
-	writeData(0x00);
-	writeData(0x01);
-	writeData(0x08);
-	writeData(0xA0);
+	spiWriteDataBuffer(seq9, sizeof(seq9));
 	writeCommand(ST7735_NORON);
 	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_DISPON);
@@ -259,24 +263,24 @@ void ST7735_TFT ::Bcmd() {
 
 void ST7735_TFT ::Rcmd1() {
 	
-
+	uint8_t seq1[] { 0x01, 0x2C, 0x2D };
+	uint8_t seq3[] { 0xA2, 0x02, 0x84 }; 
 	writeCommand(ST7735_SWRESET);
 	TFT_MILLISEC_DELAY(150);
 	writeCommand(ST7735_SLPOUT);
 	TFT_MILLISEC_DELAY(500);
 	writeCommand(ST7735_FRMCTR1);
-	static uint8_t seq1[] { 0x01, 0x2C, 0x2D };
-	writeDataBuffer(seq1, sizeof(seq1));
+	
+	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_FRMCTR2);
-	writeDataBuffer(seq1, sizeof(seq1));
+	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_FRMCTR3);
-	static uint8_t seq2[] { 0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D }; 
-	writeDataBuffer(seq2, sizeof(seq2));
+	spiWriteDataBuffer(seq1, sizeof(seq1));
+	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_INVCTR);
 	writeData(0x07);
 	writeCommand(ST7735_PWCTR1);
-	static uint8_t seq3[] { 0xA2, 0x02, 0x84 }; 
-	writeDataBuffer(seq3, sizeof(seq3));
+	spiWriteDataBuffer(seq3, sizeof(seq3));
 	writeCommand(ST7735_PWCTR2);
 	writeData(0xC5);
 	writeCommand(ST7735_PWCTR3);
@@ -300,27 +304,23 @@ void ST7735_TFT ::Rcmd1() {
 // Desc: init sub-routine
 
 void ST7735_TFT ::Rcmd2red() {
+	uint8_t seq1[] { 0x00, 0x00, 0x00, 0x7F };
+	uint8_t seq2[] { 0x00, 0x00, 0x00, 0x9F };
 	writeCommand(ST7735_CASET);
-	writeData(0x00);
-	writeData(0x00);
-	writeData(0x00);
-	writeData(0x7F);
+	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_RASET);
-	writeData(0x00);
-	writeData(0x00);
-	writeData(0x00);
-	writeData(0x9F);
+	spiWriteDataBuffer(seq2, sizeof(seq2));
 }
 
 // Desc: init sub-routine
 
 void ST7735_TFT ::Rcmd3() {
 	writeCommand(ST7735_GMCTRP1);
-	static uint8_t seq4[] {0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10}; 
-	writeDataBuffer(seq4, sizeof(seq4));
+	uint8_t seq4[] {0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10}; 
+	spiWriteDataBuffer(seq4, sizeof(seq4));
 	writeCommand(ST7735_GMCTRN1);
-	static uint8_t seq5[] {0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10}; 
-	writeDataBuffer(seq5, sizeof(seq5));
+	uint8_t seq5[] {0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10}; 
+	spiWriteDataBuffer(seq5, sizeof(seq5));
 	writeCommand(ST7735_NORON);
 	TFT_MILLISEC_DELAY(10);
 	writeCommand(ST7735_DISPON);
@@ -529,8 +529,20 @@ void ST7735_TFT  :: TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint
 
 // Func Screen : intialise PCBtyep
 // Param 1: Enum TFT_PCBtype_e , 4 choices 0-3
-void ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType)
+// Param 2 : uint32_t SPI Clock frequency in Hz, HW SPI only 
+//			 MAX 125 Mhz , MIN 30Khz(RPI3). typical/tested 8000000
+// Param 3 : uint8_t which SPI CE/CS pin to use 
+//			0 = SPICE0 GPIO08 RPI3
+//			1 = SPICE1 GPIO07 RPI3
+//  Return code 0 = success
+//			   -1 = wrong pcb_type passed
+int8_t ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz, uint8_t SPICE_Pin)
 {
+	if (_hardwareSPI == true)
+	{
+		_hertz = hertz;
+		_SPICEX_pin = SPICE_Pin;
+	}
 	uint8_t choice = pcbType;
 	switch(choice)
 	{
@@ -539,17 +551,12 @@ void ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType)
 		case TFT_ST7735S_Black: TFTBlackTabInitialize(); break;
 		case TFT_ST7735B : TFTST7735BInitialize(); break;
 		default:
-			printf("Error 1401 : Wrong input TFTInitPCBType \n");
+			std::cout << "Error:TFTInitPCBType: Wrong input pcb type:" << pcbType<<std::endl;
+			return -1;
 		break;
 	}
+	return 0;
 }
 
-// Func Desc : intialise Hardware SPI Clock Frequency
-// Param 1: uint32_t Clock frequency in Hz
-// Note :: Call after method TFTInitPCBType in setup order
-void ST7735_TFT  :: TFTInitSPIClockFrequency(uint32_t hertz) 
-{
-	bcm2835_spi_setClockDivider(bcm2835_aux_spi_CalcClockDivider(hertz));
-}
 
 //**************** EOF *****************

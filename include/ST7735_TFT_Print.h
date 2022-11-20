@@ -14,6 +14,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+// Modified 13 August 2022 by Gavin Lyons(ported from arduino builtins)
+
 #ifndef Print_h
 #define Print_h
 

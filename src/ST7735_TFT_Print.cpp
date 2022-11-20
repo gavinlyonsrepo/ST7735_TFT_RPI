@@ -18,6 +18,7 @@
  
  Modified 23 November 2006 by David A. Mellis
  Modified 03 August 2015 by Chuck Todd
+ Modified 13 August 2022 by Gavin Lyons(ported from arduino builtins)
  */
 
 #include <stdlib.h>

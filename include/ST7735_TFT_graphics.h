@@ -1,5 +1,5 @@
 /*
- * Project Name: ST7735, 128 by 128, 1.44", red pcb,SPI TFT module, lib
+ * Project Name: ST7735, 
  * File: ST7735_TFT.h
  * Description: library header file
  * Author: Gavin Lyons.
@@ -33,9 +33,10 @@ typedef enum
 	TFTFont_Seven_Seg = 3,
 	TFTFont_Wide = 4,
 	TFTFont_Tiny = 5,
-	TFTFont_Bignum = 6,
-	TFTFont_Mednum = 7,
-}TFT_FONT_TYPE_e; // Font type 1-7
+	TFTFont_HomeSpun = 6,
+	TFTFont_Bignum = 7,
+	TFTFont_Mednum = 8
+}TFT_Font_Type_e; // Font type 1-8
 
 typedef enum 
 {
@@ -96,7 +97,7 @@ class ST7735_TFT_graphics : public Print {
 
 	// Text
 	void TFTsetTextWrap(bool w);
-	void TFTFontNum(TFT_FONT_TYPE_e FontNumber);
+	void TFTFontNum(TFT_Font_Type_e FontNumber);
 	void TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
 	void TFTdrawText(uint8_t x, uint8_t y, char *_text, uint16_t color, uint16_t bg, uint8_t size);
 	void TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint16_t color ,uint16_t bg);
@@ -116,23 +117,22 @@ protected:
 
 	void pushColor(uint16_t color);
 	int16_t Color565(int16_t ,int16_t , int16_t );
-	void writeCommand(uint8_t);
-	void writeData(uint8_t);
-	void writeDataBuffer(uint8_t* data_, uint32_t len);
 	void drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
 	void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color);
-
+	
+	void writeCommand(uint8_t);
+	void writeData(uint8_t);
 	void spiWrite(uint8_t);
 	void spiWriteSoftware(uint8_t spidata);
-	void spiWriteBuffer(uint8_t* spidata, uint32_t len);
+	void spiWriteDataBuffer(uint8_t* spidata, uint32_t len);
 	
 	bool _hardwareSPI=true;
 	
-	TFT_FONT_TYPE_e FontNum;
 	uint8_t _FontNumber = TFTFont_Default;
 	uint8_t _CurrentFontWidth = TFTFont_width_5;
 	uint8_t _CurrentFontoffset = TFTFont_offset_none;
 	uint8_t _CurrentFontheight = TFTFont_height_8;
+	
 	bool _wrap = true;
 	uint16_t _textcolor =0xFFFF ;
 	uint16_t _textbgcolor =0x0000 ; //background color

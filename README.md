@@ -79,14 +79,14 @@ make run
 Software
 ----------------------
 
-In example/src/main.cpp file. There are 4 sections in "Setup()" function 
+In example/src/main.cpp file. There are 3 sections in "Setup()" function 
 where user can make adjustments to select for SPI type used, PCB type used and screen size.
 
 
 1. USER OPTION 1 SPI/GPIO TYPE
 2. USER OPTION 2 SCREEN SECTION 
-3. USER OPTION 3 PCB_TYPE
-4. USER OPTION 4 SPI SPEED
+3. USER OPTION 3 PCB_TYPE, SPI SPEED , SPI_CE_PIN
+
 
 **USER OPTION 1 SPI TYPE / GPIO**
 
@@ -103,7 +103,11 @@ These offsets can be used in the event of screen damage or manufacturing errors 
 such as cropped data or defective pixels.
 The function TFTInitScreenSize sets them.
 
-**USER OPTION 3 PCB Version**
+**USER OPTION 3 PCB Version, SPI SPEED , SPI_CE_PIN**
+
+TFTInitPCBType method
+
+1. Param1 PCB_TYPE
 
 It should work in theory on other TFT displays using the different init functions, 
 but not tested. In the main.cpp in USER OPTION 3 PCB_TYPE select your PCB.
@@ -118,13 +122,22 @@ There are 4 types of the ST7735 TFT display supported.
 | 3 | ST7735R Red Tab   | TFT_ST7735R_Red |
 | 4 | ST7735S Black Tab | TFT_ST7735S_Black |
 
-
-**USER OPTION 4 SPI SPEED** 
+2. Param2 SPI_Speed (HW SPI Only)
 
 Here the user can pass the SPI Bus freq in Hertz,
 Maximum 125 Mhz , Minimum 30Khz, The default in file is 8Mhz 
-This option is optional if you don't call it Speed is set to bcm2835 
-constant BCM2835_SPI_CLOCK_DIVIDER_32.
+If you set to 0 .Speed is set to bcm2835 
+constant BCM2835_SPI_CLOCK_DIVIDER_32. If using SW spi, ignore.
+
+3. Param3 SPI_CE_PIN (HW SPI Only)
+
+Which Chipenable pin to use two choices.
+	* SPICE0 = 0
+	* SPICE1 = 1
+
+If using SW spi, ignore.
+
+
 
 **Tested** 
  
@@ -134,8 +147,8 @@ These two are only type of ST7735 library tested on, but should work on other ty
 2. TFT SPI LCD, ST7735 Driver, RED PCB v1.2, 1.8 , 128 x 160 pixels, "ST7735S Black Tab" 
 
 The test files and full screen bitmaps are set up for number 1.  so user will have to modify 
-"USER OPTIONS" in main.cpp and provide own (128X160)bitmap to fully test number 2.
-No built-in SD card support at present and backlight control is left to user.
+"USER OPTIONS" in main.cpp..
+Backlight control is left to user.
 
 **Files**
 
@@ -152,7 +165,7 @@ There are two makefiles
 
 **Fonts**
 
-Seven fonts available : 
+8 fonts available : 
 
 | Font num | Font name | Font size xbyy |  Note |
 | ------ | ------ | ------ | ------ |  
@@ -161,11 +174,12 @@ Seven fonts available :
 | 3 | Seven segment | 4x8 | ASCII  0x20 - 0x7A |
 | 4 | Wide | 8x8 | ASCII 0x20 - 0x5A , no lowercase letters |
 | 5 | Tiny | 3x8 | ASCII  0x20 - 0x7A |
-| 6 | Big Nums | 16x32 | ASCII 0x2E-0x3A , Numbers + : . only |
-| 7 | Med Nums | 16x16 | ASCII 0x2E-0x3A , Numbers + : . only |
+| 6 | Homespun | 7x8 | ASCII  0x20 - 0x7A |
+| 7 | Big Nums | 16x32 | ASCII 0x2E-0x3A , Numbers + : . only |
+| 8 | Med Nums | 16x16 | ASCII 0x2E-0x3A , Numbers + : . only |
 
-The fonts 1-5 are byte high(at text size 1) scale-able fonts,
-The large numerical Fonts, 6 & 7 cannot be scaled.
+The fonts 1-6 are byte high(at text size 1) scale-able fonts,
+The large numerical Fonts, 7 & 8  cannot be scaled.
 
 **Bitmap**
 
@@ -173,23 +187,24 @@ There are four functions to support drawing bitmaps
 
 | Function Name | Colour support | Pixel size |  Note |
 | ------ | ------ | ------ | ------ |
-| TFTdrawIcon | bi-colour | 8 x(0-127) , 128 bytes max  | Data vertically addressed |
-| TFTdrawBitmap | bi-colour | 128 by 128 , 2048 bytes max | Data horizontally  addressed |
-| TFTdrawBitmap16 | 16 bit color 565 BMP files | 128 by 128 = 32K max | ------ |
-| TFTdrawBitmap24  | 24 bit color BMP files | 128 by 128 = 48K max | Converted by software to 16-bit color  |
+| TFTdrawIcon | bi-colour | 8 x(0-127)   | Data vertically addressed |
+| TFTdrawBitmap | bi-colour |  2048 bytes max | Data horizontally  addressed |
+| TFTdrawBitmap16 | 16 bit color 565 BMP files |  32K max | ------ |
+| TFTdrawBitmap24  | 24 bit color BMP files | 48K max | Converted by software to 16-bit color  |
 
-Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
+1. Bitmap size in kiloBytes = (screenWidth * screenHeight * bitsPerPixel)/(1024 * 8)
+2. Pixel size column assumes 128 by 128 screen.
 
 Hardware
 ----------------------
 
 Connections as setup in main.cpp test file.
 
-| TFT PinNum | Pindesc | RPI SW SPI | RPI HW SPI |
+| TFT PinNum | Pindesc | RPI HW SPI | RPI SW SPI |
 | --- | --- | --- | --- |
 | 1 | LED | VCC |  VCC |
-| 2 | SCLK | SPI_CLK | GPIO11 |
-| 3 | SDA | SPI_MOSI | GPIO10 |
+| 2 | SCLK | SPI_CLK | GPIO5 |
+| 3 | SDA | SPI_MOSI | GPIO6 |
 | 4 | A0/DC | GPIO24 | GPIO24  |
 | 5 | RESET | GPI025  | GPIO25 |
 | 6 | SS/CS | SPI_CE0 | GPIO8 |
@@ -200,7 +215,7 @@ Connections as setup in main.cpp test file.
 2. This is a 3.3V logic device do NOT connect the I/O logic lines to 5V logic device.
 3. You can connect VCC to 5V if there is a 3.3 volt regulator on back of TFT module.
 4. Pick any GPIO you want for SW SPI for HW SPI: reset and DC lines are flexible.
-
+5. User can select  SPI_CE0  or SPI_CE1 for HW SPI
 ![ wiring ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/wiring.jpg)
 
 Output
@@ -210,11 +225,11 @@ Output of some of the test routine's. Left to right, top to bottom.
 
 1. Different defined colors at default font size 1. Full 16 bit colour 565 available
 2. Different sizes of default font. Size 2 3 4 & 5 shown.
-3. Different Fonts at font size 2, fonts 1-5. Are these fonts are scale-able
+3. Different Fonts at font size 2, fonts 1-5. Are these fonts are scale-able, font 6 not shown.
 4. Shapes
 5. More Shapes
 6. Bitmap (bi-color) A background and a foreground.
-7. Clock Demo showing icons, small bitmaps and font 6 "BigNums"
+7. Clock Demo showing icons, small bitmaps and font 7 "BigNums"
 8. 24-bit color bitmap test image
 9. 16-bit color bitmap test image
 

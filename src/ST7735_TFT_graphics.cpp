@@ -1,5 +1,5 @@
 /*
- * Project Name: ST7735, 128 by 128, 1.44", red pcb,  SPI TFT module
+ * Project Name: ST7735, 
  * File: ST7735_TFT.cpp
  * Description: library source file
  * Author: Gavin Lyons.
@@ -67,6 +67,11 @@ void ST7735_TFT_graphics ::TFTfillRectangle(uint8_t x, uint8_t y, uint8_t w, uin
 
 	// Create bitmap buffer
 	uint8_t* buffer = (uint8_t*)malloc(w*h*sizeof(uint16_t));
+	if (buffer == NULL) // check malloc
+	{
+		std::cout << "TFTfillRectangle :: Error : MALLOC could not assign memory " << std::endl;
+		return; 
+	}
 	for(uint32_t i = 0; i<w*h*sizeof(uint16_t);) {
 		buffer[i++] = hi;
 		buffer[i++] = lo;
@@ -74,11 +79,7 @@ void ST7735_TFT_graphics ::TFTfillRectangle(uint8_t x, uint8_t y, uint8_t w, uin
 
 	// Set window and write buffer
 	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
-	TFT_DC_SetHigh;
-	if (_hardwareSPI == false){TFT_CS_SetLow;}
-	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
-	if (_hardwareSPI == false){TFT_CS_SetHigh;}
-
+	spiWriteDataBuffer(buffer, h*w*sizeof(uint16_t));
 	free(buffer);
 }
 
@@ -372,7 +373,7 @@ void ST7735_TFT_graphics ::TFTfillTriangle(int16_t x0, int16_t y0, int16_t x1, i
 // Param 4: color 565 16-bit
 // Param 5: background color
 // Param 6: size. 1-x
-// Notes for font #1-5
+// Notes for font #1-6
 
 void ST7735_TFT_graphics ::TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size) {
 
@@ -401,8 +402,11 @@ void ST7735_TFT_graphics ::TFTdrawChar(uint8_t x, uint8_t y, uint8_t c, uint16_t
 			case TFTFont_Tiny:
 				 line = Font_Five[(c - _CurrentFontoffset ) * _CurrentFontWidth + i];
 			break;
+			case TFTFont_HomeSpun:
+				 line = Font_Six[(c - _CurrentFontoffset ) * _CurrentFontWidth + i];
+			break;
 			default:
-				printf("Error wrong font number set must be 1-5\n");
+				std::cout << "TFTdrawChar :: Error wrong font number set must be 1-6" << std::endl;
 				return;
 			break;
 		}
@@ -431,7 +435,7 @@ void ST7735_TFT_graphics ::TFTsetTextWrap(bool w) {
 // Param 4: color 565 16-bit
 // Param 5: background color
 // Param 6: size 1-x
-// Notes for font #1-5
+// Notes for font #1-6
 
 void ST7735_TFT_graphics ::TFTdrawText(uint8_t x, uint8_t y, char *ptext, uint16_t color, uint16_t bg, uint8_t size) {
 	uint8_t _cursorX, _cursorY;
@@ -513,16 +517,12 @@ size_t ST7735_TFT_graphics ::write(uint8_t c)
 
 
 // Desc :  Set the font number
-// Param1: Param1: fontnumber 1-7 enum OLED_FONT_TYPE_e
-// 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=bignums 7=mednums
+// Param1: Param1: fontnumber 1-8 enum OLED_FONT_TYPE_e
+// 1=default 2=thick 3=seven segment 4=wide 5=tiny 6=homespun 7=bignums 8=mednums
 
-void ST7735_TFT_graphics ::TFTFontNum(TFT_FONT_TYPE_e FontNumber) {
+void ST7735_TFT_graphics ::TFTFontNum(TFT_Font_Type_e FontNumber) {
 
 	_FontNumber = FontNumber;
-
-	TFT_Font_width_e setfontwidth;
-	TFT_Font_offset_e setoffset;
-	TFT_Font_height_e setfontheight;
 
 	switch (_FontNumber)
 	{
@@ -551,6 +551,11 @@ void ST7735_TFT_graphics ::TFTFontNum(TFT_FONT_TYPE_e FontNumber) {
 			_CurrentFontoffset =  TFTFont_offset_space;
 			_CurrentFontheight = TFTFont_height_8;
 		break;
+		case TFTFont_HomeSpun:  // homespun 7 by 8
+			_CurrentFontWidth = TFTFont_width_7;
+			_CurrentFontoffset =  TFTFont_offset_space;
+			_CurrentFontheight = TFTFont_height_8;
+		break;
 		case TFTFont_Bignum: // big nums 16 by 32 (NUMBERS + : only)
 			_CurrentFontWidth = TFTFont_width_16;
 			_CurrentFontoffset =   TFTFont_offset_zero;
@@ -562,10 +567,10 @@ void ST7735_TFT_graphics ::TFTFontNum(TFT_FONT_TYPE_e FontNumber) {
 			_CurrentFontheight = TFTFont_height_16;
 		break;
 		default:
-			printf("Error: Wrong font number ,must be 1-7\n");
-			_CurrentFontWidth = (setfontwidth = TFTFont_width_5);
-			_CurrentFontoffset =  (setoffset = TFTFont_offset_none);
-			_CurrentFontheight = (setfontheight=TFTFont_height_8);
+			std::cout << "TFTFontNum : Error: Wrong font number ,must be 1-8" << std::endl;
+			_CurrentFontWidth = TFTFont_width_5;
+			_CurrentFontoffset =  TFTFont_offset_none;
+			_CurrentFontheight = TFTFont_height_8;
 			_FontNumber = TFTFont_Default;
 		break;
 	}
@@ -603,13 +608,12 @@ void ST7735_TFT_graphics ::TFTdrawIcon(uint8_t x, uint8_t y, uint8_t w, uint16_t
 // Param 3,4 0-127 possible values width and height of bitmap in pixels
 // Param 4,5 bitmap colors ,bitmap is bi-color
 // Param 6: an array of unsigned chars containing bitmap data horizontally addressed.
-// Note as of version 1.4 uses spiWriteBuffer method
 void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, uint16_t bgcolor, uint8_t *pBmp) {
 	int16_t byteWidth = (w + 7) / 8;
 	uint8_t byte = 0;
 	uint16_t mycolor = 0;
 	uint32_t ptr;
-	int16_t temp_y=y;
+
 	// Check bounds
 	if ((x >= _widthTFT) || (y >= _heightTFT)) return;
 	if ((x + w - 1) >= _widthTFT) w = _widthTFT - x;
@@ -617,9 +621,14 @@ void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_
 	
 	// Create bitmap buffer
 	uint8_t* buffer = (uint8_t*)malloc(w * h * 2);
+	if (buffer == NULL) // check malloc
+	{
+		std::cout << "TFTdrawBitmap:: Error : MALLOC could not assign memory " << std::endl;
+		return; 
+	}
 	ptr = 0;
 	
-	for (int16_t j = 0; j < h; j++, y++)
+	for (int16_t j = 0; j < h; j++)
 	{
 		for (int16_t i = 0; i < w; i++)
 		{
@@ -633,13 +642,9 @@ void ST7735_TFT_graphics ::TFTdrawBitmap(int16_t x, int16_t y, int16_t w, int16_
 		}
 	}
 	// Set window and write buffer
-	y = temp_y;
 	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
-	TFT_DC_SetHigh;
-	if (_hardwareSPI == false){TFT_CS_SetLow;}
-	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
-	if (_hardwareSPI == false){TFT_CS_SetHigh;}
-
+	spiWriteDataBuffer(buffer, h*w*sizeof(uint16_t));
+	
 	free(buffer);
 }
 
@@ -662,7 +667,11 @@ void ST7735_TFT_graphics ::TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, 
 	
 	// Create bitmap buffer
 	uint8_t* buffer = (uint8_t*)malloc(w * h * 2);
-
+	if (buffer == NULL) // check malloc
+	{
+		std::cout << "TFTdrawBitmap24 :: Error : MALLOC could not assign memory " << std::endl;
+		return; 
+	}
 	ptr = 0;
 	for(j = 0; j < h; j++)
 	{
@@ -678,10 +687,8 @@ void ST7735_TFT_graphics ::TFTdrawBitmap24(uint8_t x, uint8_t y, uint8_t *pBmp, 
 
 	// Set window and write buffer
 	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
-	TFT_DC_SetHigh;
-	if (_hardwareSPI == false){TFT_CS_SetLow;}
-	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
-	if (_hardwareSPI == false){TFT_CS_SetHigh;}
+	spiWriteDataBuffer(buffer, h*w*sizeof(uint16_t));
+
 
 	free(buffer);
 }
@@ -704,6 +711,11 @@ void ST7735_TFT_graphics ::TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, 
 	
 	// Create bitmap buffer
 	uint8_t* buffer = (uint8_t*)malloc(w * h * 2);
+	if (buffer == NULL) // check malloc
+	{
+		std::cout << "TFTdrawBitmap16 :: Error : MALLOC could not assign memory " << std::endl;
+		return; 
+	}
 	ptr = 0;
 	
 	for(j = 0; j < h; j++)
@@ -718,10 +730,7 @@ void ST7735_TFT_graphics ::TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, 
 	
 	// Set window and write buffer
 	TFTsetAddrWindow(x, y, x + w - 1, y + h - 1);
-	TFT_DC_SetHigh;
-	if (_hardwareSPI == false){TFT_CS_SetLow;}
-	spiWriteBuffer(buffer, h*w*sizeof(uint16_t));
-	if (_hardwareSPI == false){TFT_CS_SetHigh;}
+	spiWriteDataBuffer(buffer, h*w*sizeof(uint16_t));
 
 	free(buffer);
 }
@@ -731,13 +740,13 @@ void ST7735_TFT_graphics ::TFTdrawBitmap16(uint8_t x, uint8_t y, uint8_t *pBmp, 
 // Param 3: The ASCII character
 // Param 4: color 565 16-bit
 // Param 5: background color
-// Notes for font 7,6 only
+// Notes for font 7-8 only
 
 void ST7735_TFT_graphics ::TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, uint16_t color , uint16_t bg)
 {
 	if (_FontNumber < TFTFont_Bignum)
 	{
-		printf("Error: Wrong font selected, must be 6 or 7 \n");
+		std::cout << "TFTdrawCharNumFont :: Error: Wrong font selected, must be 7 or 8 " << std::endl;
 		return;
 	}
 
@@ -747,10 +756,10 @@ void ST7735_TFT_graphics ::TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, u
 	for (i = 0; i < _CurrentFontheight*2; i++)
 	{
 		if (_FontNumber == TFTFont_Bignum){
-			ctemp = Font_Six[c - _CurrentFontoffset][i];
+			ctemp = Font_Seven[c - _CurrentFontoffset][i];
 		}
 		else if (_FontNumber == TFTFont_Mednum){
-			ctemp = Font_Seven[c - _CurrentFontoffset][i];
+			ctemp = Font_Eight[c - _CurrentFontoffset][i];
 		}
 
 		for (j = 0; j < 8; j++)
@@ -780,13 +789,13 @@ void ST7735_TFT_graphics ::TFTdrawCharNumFont(uint8_t x, uint8_t y, uint8_t c, u
 // Param 3: pointer to string
 // Param 4: color 565 16-bit
 // Param 5: background color
-// Notes for font 7 6 only
+// Notes for font 7 8 only
 
 void ST7735_TFT_graphics ::TFTdrawTextNumFont(uint8_t x, uint8_t y, char *pText, uint16_t color, uint16_t bg)
 {
 	if (_FontNumber < TFTFont_Bignum)
 	{
-		printf("Error: Wrong font selected, must be 6 or 7 \n");
+		std::cout << "TFTdrawTextNumFont : Error: Wrong font selected, must be 7 or 8 " << std::endl;
 		return;
 	}
 
@@ -828,31 +837,35 @@ void ST7735_TFT_graphics ::pushColor(uint16_t color) {
 // Desc: Write an SPI command
 // Param1: command byte to send
 
-void ST7735_TFT_graphics::writeCommand(uint8_t cmd_) {
+void ST7735_TFT_graphics::writeCommand(uint8_t spicmdbyte) {
 	TFT_DC_SetLow;
-	TFT_CS_SetLow;
-	spiWrite(cmd_);
-	TFT_CS_SetHigh;
+	if (_hardwareSPI == false){TFT_CS_SetLow;}
+	spiWrite(spicmdbyte);
+	if (_hardwareSPI == false){TFT_CS_SetHigh;}
 }
 
 // Desc: Write SPI data
 // Param1: data byte to send
 
-void ST7735_TFT_graphics ::writeData(uint8_t data_) {
+void ST7735_TFT_graphics ::writeData(uint8_t spidatabyte) {
 	TFT_DC_SetHigh;
-	TFT_CS_SetLow;
-	spiWrite(data_);
-	TFT_CS_SetHigh;
+	if (_hardwareSPI == false){TFT_CS_SetLow;}
+	spiWrite(spidatabyte);
+	if (_hardwareSPI == false){TFT_CS_SetHigh;}
 }
 
 // Desc: Write SPI databuffer
 // Param1: data array to send
-
-void ST7735_TFT_graphics ::writeDataBuffer(uint8_t* data_, uint32_t len) {
+// Param2: length of Array
+void ST7735_TFT_graphics ::spiWriteDataBuffer(uint8_t* spidata, uint32_t len) {
 	TFT_DC_SetHigh;
-	TFT_CS_SetLow;
-	spiWriteBuffer(data_, len);
-	TFT_CS_SetHigh;
+	if(_hardwareSPI == false) {
+		TFT_CS_SetLow;
+		for(uint32_t i=0; i<len; i++) {spiWriteSoftware(spidata[i]);}
+		TFT_CS_SetHigh;
+	} else {
+		bcm2835_spi_writenb((char*)spidata,len);
+	}
 }
 
 // Desc: Write to SPI
@@ -876,24 +889,10 @@ void ST7735_TFT_graphics::spiWriteSoftware(uint8_t spidata) {
 		TFT_SDATA_SetLow;
 		if (spidata & 0x80)TFT_SDATA_SetHigh; // b1000000 Mask with 0 & all zeros out.
 		TFT_SCLK_SetHigh;
-		TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
+		if (TFT_HIGHFREQ_DELAY > 0) TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
 		spidata <<= 1;
 		TFT_SCLK_SetLow;
-		TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
-	}
-}
-
-// Desc: Write a buffer to SPI, both Software and hardware SPI supported
-// Param1: bytes to send
-// Param2: length of buffer
-
-void ST7735_TFT_graphics::spiWriteBuffer(uint8_t* spidata, uint32_t len) {
-	if(_hardwareSPI == false) {
-		for(uint32_t i=0; i<len; i++) {
-			spiWriteSoftware(spidata[i]);
-		}
-	} else {
-		bcm2835_spi_writenb((char*)spidata,len);
+		if (TFT_HIGHFREQ_DELAY > 0) TFT_MICROSEC_DELAY(TFT_HIGHFREQ_DELAY);
 	}
 }
 
