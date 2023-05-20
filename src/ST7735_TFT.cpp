@@ -1,21 +1,21 @@
-/*
- * Project Name: ST7735, 
- * File: ST7735_TFT.cpp
- * Description: library source file
- * Author: Gavin Lyons.
- * Created May 2021
- * Description: See URL for full details.
- * URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
- */
+/*!
+	@file     ST7735_TFT.cpp
+	@author   Gavin Lyons
+	@brief    Source file for ST7735_TFT_RPI library. 
+	Contains driver methods for ST7735_TFT display 
 
-#include "ST7735_TFT.h"
- 
- 
-ST7735_TFT :: ST7735_TFT()
-{
-}
+	@note  See URL for full details.https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
+		
+*/
 
-// Desc : Init Hardware SPI
+#include "ST7735_TFT.hpp"
+ 
+/*! @brief Constructor for class ST7735_TFT */ 
+ST7735_TFT :: ST7735_TFT(){}
+
+/*!
+	@brief  Init Hardware SPI
+*/
 void ST7735_TFT::TFTSPIInitialize(void)
 {
 	bcm2835_spi_begin();
@@ -39,12 +39,13 @@ void ST7735_TFT::TFTSPIInitialize(void)
 	}
 }
 
-
-// Desc: Call when powering down TFT
-// Turns off Display Sets GPIO low and turns off SPI 
-// 	End SPI operations. SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), 
-// P1-24 (CE0) and P1-26 (CE1) 
-// are returned to their default INPUT behavior.
+/*!
+	@brief Call when powering down TFT
+	
+	@note Turns off Display Sets GPIO low and turns off SPI 
+	End SPI operations. SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), 
+	P1-24 (CE0) and P1-26 (CE1) are returned to their default INPUT behavior.
+*/
 void ST7735_TFT ::TFTPowerDown(void)
 {
 	TFTchangeMode(TFT_Display_off_mode);
@@ -61,8 +62,9 @@ if (_hardwareSPI == false)
 	} 
 }
 
-// Desc: Function for Hardware Reset pin control
-
+/*!
+	@brief: Method for Hardware Reset pin control
+*/
 void ST7735_TFT ::TFTResetPIN() {
 	TFT_RST_SetDigitalOutput;
 	TFT_RST_SetHigh;
@@ -73,13 +75,14 @@ void ST7735_TFT ::TFTResetPIN() {
 	TFT_MILLISEC_DELAY(10);
 }
 
-// Desc : sets up TFT GPIO
-// Param 1: reset GPIO 
-// Param 2: data or command GPIO.
-// Param 3: chip select GPIO -> Software SPI only set to -1 for HW SPI
-// Param 4: Data clock GPIO  -> Software SPI only set to -1 for HW SPI
-// Param 5: Data to TFT GPIO -> Software SPI only set to -1 for HW SPI
-
+/*!
+	@brief  sets up TFT GPIO
+	@param rst reset GPIO 
+	@param dc data or command GPIO.
+	@param cs chip select GPIO   -> Software SPI only set to -1 for HW SPI
+	@param sclk Data clock GPIO  -> Software SPI only set to -1 for HW SPI
+	@param din Data to TFT GPIO  -> Software SPI only set to -1 for HW SPI
+*/
 void ST7735_TFT ::TFTSetupGPIO(int8_t rst, int8_t dc, int8_t cs, int8_t sclk, int8_t din)
 {
 if((cs != -1) && (sclk != -1) && (din != -1))
@@ -96,8 +99,9 @@ if((cs != -1) && (sclk != -1) && (din != -1))
 }
 
 
-// Desc: init sub-routine ST7735R Green Tab
-
+/*!
+	@brief init sub-routine ST7735R Green Tab
+*/
 void ST7735_TFT ::TFTGreenTabInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
@@ -118,8 +122,9 @@ if (_hardwareSPI == false){
 	TFT_PCBtype = TFT_ST7735R_Green;
 }
 
-// Desc: init sub-routine ST7735R Green Tab
-
+/*!
+	@brief init sub-routine ST7735R Green Tab
+*/
 void ST7735_TFT ::Rcmd2green() {
 	uint8_t seq1[] {0x00, 0x02, 0x00, (0x7F + 0x02)}; 
 	uint8_t seq2[] {0x00, 0x01, 0x00, (0x9F + 0x01)}; 
@@ -130,8 +135,9 @@ void ST7735_TFT ::Rcmd2green() {
 }
 
 
-// Desc: ST7735R Red Tab Init Red PCB version
-
+/*!
+	@brief ST7735R Red Tab Init Red PCB version
+*/
 void ST7735_TFT ::TFTRedTabInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
@@ -154,8 +160,9 @@ if (_hardwareSPI == false)
 
 }
 
-// Desc: Init Routine ST7735R Black Tab (ST7735S)
-
+/*!
+	@brief Init Routine ST7735R Black Tab (ST7735S)
+*/
 void ST7735_TFT ::TFTBlackTabInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
@@ -179,8 +186,9 @@ if (_hardwareSPI == false)
 	TFT_PCBtype = TFT_ST7735S_Black ;
 }
 
-// Desc: init routine for ST7735B controller
-
+/*!
+	@brief init routine for ST7735B controller
+*/
 void ST7735_TFT ::TFTST7735BInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
@@ -201,8 +209,9 @@ if (_hardwareSPI == false)
 }
 
 
-// Desc: init routine for ST7735B controller
-
+/*!
+	@brief init sub-routine for ST7735B controller
+*/
 void ST7735_TFT ::Bcmd() {
 	uint8_t seq6[] {0x09, 0x16, 0x09, 0x20, 0x21, 0x1B, 0x13, 0x19, 0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E}; 
 	uint8_t seq7[] {0x0B, 0x14, 0x08, 0x1E, 0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F}; 
@@ -259,8 +268,9 @@ void ST7735_TFT ::Bcmd() {
 }
 
 
-// Desc: init routine
-
+/*!
+	@brief init sub-routine
+*/
 void ST7735_TFT ::Rcmd1() {
 	
 	uint8_t seq1[] { 0x01, 0x2C, 0x2D };
@@ -301,8 +311,9 @@ void ST7735_TFT ::Rcmd1() {
 	writeData(0x05);
 }
 
-// Desc: init sub-routine
-
+/*!
+	@brief init sub-routine
+*/
 void ST7735_TFT ::Rcmd2red() {
 	uint8_t seq1[] { 0x00, 0x00, 0x00, 0x7F };
 	uint8_t seq2[] { 0x00, 0x00, 0x00, 0x9F };
@@ -312,8 +323,9 @@ void ST7735_TFT ::Rcmd2red() {
 	spiWriteDataBuffer(seq2, sizeof(seq2));
 }
 
-// Desc: init sub-routine
-
+/*!
+	@brief init sub-routine
+*/
 void ST7735_TFT ::Rcmd3() {
 	writeCommand(ST7735_GMCTRP1);
 	uint8_t seq4[] {0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10}; 
@@ -328,11 +340,12 @@ void ST7735_TFT ::Rcmd3() {
 }
 
 
-// Desc: This method defines the Vertical Scrolling Area of the display where:
-// Param 1: top_fix_heightTFT: describes the Top Fixed Area,
-// Param 2: bottom_fix_heightTFT: describes the Bottom Fixed Area and
-// Param 3: _scroll_direction: is scroll direction (0 for top to bottom and 1 for bottom to top).
-
+/*!
+	@brief This method defines the Vertical Scrolling Area of the display where:
+	@param top_fix_heightTFT describes the Top Fixed Area,
+	@param bottom_fix_heightTFT describes the Bottom Fixed Area and
+	@param _scroll_direction is scroll direction (0 for top to bottom and 1 for bottom to top).
+*/
 void ST7735_TFT ::TFTsetScrollDefinition(uint8_t top_fix_heightTFT, uint8_t bottom_fix_heightTFT, bool _scroll_direction) {
 	uint8_t scroll_heightTFT;
 	scroll_heightTFT = _heightTFT - top_fix_heightTFT - bottom_fix_heightTFT;
@@ -367,15 +380,19 @@ void ST7735_TFT ::TFTsetScrollDefinition(uint8_t top_fix_heightTFT, uint8_t bott
 	}
 }
 
-// Desc: This method is used together with the TFTsetScrollDefinition.
-// These two methods describe the scrolling area and the scrolling mode.
-
+/*!
+	@brief: This method is used together with the TFTsetScrollDefinition.
+*/
 void ST7735_TFT ::TFTVerticalScroll(uint8_t _vsp) {
 	writeCommand(ST7735_VSCRSADD);
 	writeData(0x00);
 	writeData(_vsp);
 }
 
+/*!
+	@brief Toggle the invert mode
+	@param invertModeOn true invert on false invert off
+*/
 void ST7735_TFT ::TFTchangeInvertMode(bool invertModeOn) {
 	if(invertModeOn) {
 		writeCommand(ST7735_INVON);
@@ -384,16 +401,17 @@ void ST7735_TFT ::TFTchangeInvertMode(bool invertModeOn) {
 	}
 }
 
-/*
-Desc: This changes the mode of the display as:
-	TFT_Normal_mode: Normal mode.
-	TFT_Partial_mode: Enable partial mode to work in portions of display 
-	TFT_Idle_mode: Idle_mode consume less current and shows less color
-	TFT_Sleep_mode: Put display driver section in sleep but rest of the logic works.
-	TFT_Invert_mode: invert the display
-	TFT_Display_on_mode: Turn on display
-	TFT_Display_off_mode: Turn off display
- */
+/*!
+	@brief This changes the mode of the display as:
+	@param mode enum TFT_mode value
+		-# TFT_Normal_mode: Normal mode.
+		-# TFT_Partial_mode: Enable partial mode to work in portions of display 
+		-# TFT_Idle_mode: Idle_mode consume less current and shows less color
+		-# TFT_Sleep_mode: Put display driver section in sleep but rest of the logic works.
+		-# TFT_Invert_mode: invert the display
+		-# TFT_Display_on_mode: Turn on display
+		-# TFT_Display_off_mode: Turn off display
+*/
 void ST7735_TFT ::TFTchangeMode(TFT_modes_e mode) {
 	switch (mode) {
 		case TFT_Normal_mode:
@@ -443,21 +461,22 @@ void ST7735_TFT ::TFTchangeMode(TFT_modes_e mode) {
 }
 
 
-// Desc: change rotation of display.
-// Param1 : TFT_modes_e enum
-// 0 = Normal
-// 1=  90 rotate
-// 2 = 180 rotate
-// 3 =  270 rotate
-// Note: if on your display colors are wrong after rotate change
-// ST7735_MADCTL_BGR to ST7735_MADCTL_RGB
-
+/*!
+	@brief: change rotation of display.
+	@param mode TFT_rotate_e enum
+	0 = Normal
+	1=  90 rotate
+	2 = 180 rotate
+	3 =  270 rotate
+	@note if on your display colors are wrong after rotate change
+	you may have chosen wrong display pcb type.
+*/
 void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 	uint8_t madctl = 0;
 
 	_rotation = mode % 4;
 	switch (_rotation) {
-		case TFT_Degress_0 :
+		case TFT_Degrees_0 :
 			if (TFT_PCBtype == TFT_ST7735S_Black ){
 				madctl = ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB;
 			}else{
@@ -468,7 +487,7 @@ void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 			_XStart = _colstart;
 			_YStart = _rowstart;
 			break;
-		case TFT_Degress_90:
+		case TFT_Degrees_90:
 			if (TFT_PCBtype == TFT_ST7735S_Black )
 			{
 				madctl = ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_RGB;
@@ -480,7 +499,7 @@ void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 			_widthTFT  =_heightStartTFT;
 			_heightTFT = _widthStartTFT;
 			break;
-		case TFT_Degress_180:
+		case TFT_Degrees_180:
 			if (TFT_PCBtype == TFT_ST7735S_Black)
 			{
 				madctl = ST7735_MADCTL_RGB;
@@ -492,7 +511,7 @@ void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 			_widthTFT =_widthStartTFT;
 			_heightTFT = _heightStartTFT;
 			break;
-		case TFT_Degress_270:
+		case TFT_Degrees_270:
 			if (TFT_PCBtype == TFT_ST7735S_Black){
 				madctl = ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_RGB;
 			}else{
@@ -508,12 +527,14 @@ void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 	writeData(madctl);
 }
 
-// Func Desc: initialise the variables that define the size of the screen
-// These offsets can be adjusted for any issues with manufacture tolerance/defects
-// Param 1: Column offset
-// Param 2: Row offset
-// Param 3: Screen width in pixels
-// Param 4: Screen height in pixels
+/*!
+	@brief initialise the variables that define the size of the screen
+	@param colOffset Column offset
+	@param rowOffset row offset
+	@param width_TFT width in pixels
+	@param height_TFT height in pixels
+	@note  The offsets can be adjusted for any issues with manufacture tolerance/defects
+*/
 void ST7735_TFT  :: TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint16_t width_TFT, uint16_t height_TFT)
 {
 	_colstart = colOffset; 
@@ -527,15 +548,13 @@ void ST7735_TFT  :: TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint
 	_heightStartTFT = height_TFT;
 }
 
-// Func Screen : intialise PCBtyep
-// Param 1: Enum TFT_PCBtype_e , 4 choices 0-3
-// Param 2 : uint32_t SPI Clock frequency in Hz, HW SPI only 
-//			 MAX 125 Mhz , MIN 30Khz(RPI3). typical/tested 8000000
-// Param 3 : uint8_t which SPI CE/CS pin to use 
-//			0 = SPICE0 GPIO08 RPI3
-//			1 = SPICE1 GPIO07 RPI3
-//  Return code 0 = success
-//			   -1 = wrong pcb_type passed
+/*!
+	@brief intialise PCBtype and SPI
+	@param pcbType 4 choices 0-3
+	@param hertz  SPI Clock frequency in Hz, HW SPI only MAX 125 Mhz , MIN 30Khz(RPI3). typical/tested 8000000
+	@param SPICE_Pin which SPI CE/CS pin to use 0 = SPICE0 GPIO08 RPI3, 1 = SPICE1 GPIO07 RPI3
+	@return 0 = success, -1 = wrong pcb_type passed
+*/
 int8_t ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz, uint8_t SPICE_Pin)
 {
 	if (_hardwareSPI == true)

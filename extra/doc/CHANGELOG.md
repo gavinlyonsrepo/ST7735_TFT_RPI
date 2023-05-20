@@ -31,4 +31,8 @@
 		added option to select chip enable line(0 or 1)
 	* methods spiWriteBuffer & writeDataBuffer merged to single method spiWriteDataBuffer
 	* replaced printf with cout
-	
+* Verison 1.6 May 2023
+	* Added Doxygen style comments for software API generation.
+	* h files change to hpp files.
+	* Enums made part of relevant class. 
+	* font and bitmp data placed in Cpp files.

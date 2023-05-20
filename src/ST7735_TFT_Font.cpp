@@ -1,11 +1,13 @@
-/* 
-* Font data file for TFT library.
-* 8 fonts
-* URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
+/*!
+	@file     ST7735_TFT_Font.cpp
+	@author   Gavin Lyons
+	@brief    Source file for ST7735_TFT_RPI library font data
+              This file contains the font definitions and data.	
+              8 fonts. 
 */
 
-#ifndef fontfile_one_H
-#define fontfile_one_H
+#include "ST7735_TFT_Font.hpp"
+
 
 // "default" 5 by 8 font pixel ASCII font 
 // Standard ASCII 5x7 font 
@@ -274,7 +276,7 @@ static const unsigned char Font_One[] = {
 //  
 // NO LOWERCASE LETTERS
 
-static const char Font_Two[] = {
+static const unsigned char Font_Two[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00, //  
 	0x5f,0x5f,0x00,0x00,0x00,0x00,0x00, // !
 	0x07,0x07,0x00,0x07,0x07,0x00,0x00, // "
@@ -339,7 +341,7 @@ static const char Font_Two[] = {
 // ASCII font file : "Seven Segment" 4 by 8 
 // Define the ASCII table as Data array
 
-static const  char Font_Three[] = {
+static const  unsigned char Font_Three[] = {
 	0x00,0x00,0x00,0x00, //  
 	0x00,0x36,0x00,0x00, // !
 	0x06,0x00,0x00,0x06, // "
@@ -438,7 +440,7 @@ static const  char Font_Three[] = {
 // cols left to right 0x00 is  off 0xFF is all on
 // Each character is 8 bits wide one byte height. 
 // NO LOWERCASE LETTERS
-static const  char Font_Four[]  = {
+static const  unsigned char Font_Four[]  = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, //  
 	0x00,0x00,0x00,0x5F,0x00,0x00,0x00,0x00, // !
 	0x00,0x03,0x00,0x03,0x00,0x00,0x00,0x00, // "
@@ -505,7 +507,7 @@ static const  char Font_Four[]  = {
 // cols left to right, 0x00 is off, 0xFF is all on
 // Each character is 3 bits wide one byte height. 
 
-static const  char Font_Five[]  = {
+static const  unsigned char Font_Five[]  = {
 	0x00,0x00,0x00, //  
 	0x00,0x2e,0x00, // !
 	0x06,0x00,0x06, // "
@@ -798,4 +800,11 @@ static const  uint8_t Font_Eight[11][32] =
 	0x18,0x30,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},/*":",10*/
 };
 
-#endif
+const unsigned char * pFontDefaultptr = Font_One;
+const unsigned char * pFontThickptr = Font_Two;
+const unsigned char * pFontSevenSegptr = Font_Three;
+const unsigned char * pFontWideptr = Font_Four;
+const unsigned char * pFontTinyptr = Font_Five;
+const unsigned char * pFontHomeSpunptr = Font_Six;
+const uint8_t (* pFontBigNumptr)[64] = Font_Seven;
+const uint8_t (* pFontMedNumptr)[32] = Font_Eight;

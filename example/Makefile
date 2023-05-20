@@ -6,12 +6,21 @@
 # 2. make clean = deletes .o files generated (by step 1) from build directory
 # 3. make run = run test file (made by step 1), sudo bin/test
 
+# ************************************************
+# User SRC directory Option Section
+# pick on example "SRC" dir and ONE ONLY.
+# Comment out the others. #
+
+SRC=src/Tests
+#SRC=src/Hello_world
+#SRC=src/Frame_rate_test
+# ************************************************
+
 CC=g++
 LDFLAGS= -lbcm2835 -lrt -lST7735_TFT_RPI
 CFLAGS = -Iinclude/  -c -Wall 
-MD=mkdir
 
-SRC=src
+MD=mkdir
 OBJ=obj
 SRCS = $(wildcard $(SRC)/*.cpp)
 OBJS = $(patsubst $(SRC)/%.cpp,  $(OBJ)/%.o, $(SRCS))

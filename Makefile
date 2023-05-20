@@ -1,5 +1,5 @@
 # Gavin lyons 06-2021
-# Makefile to install library for ST7735_TFT_RPIlibrary.
+# Makefile to install library for ST7735_TFT_RPI.
 # URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
 # Library is installed to /usr/lib and include files are placed at /usr/include.
 # Uninstall and clean options provided
@@ -63,10 +63,8 @@ install:
 	@echo
 	@echo "[INSTALL HEADERS]"
 	@if ( test ! -d $(PREFIX)/include ) ; then mkdir -p $(PREFIX)/include ; fi
-	@cp -vf  include/ST7735_TFT.h $(PREFIX)/include
-	@cp -vf  include/ST7735_TFT_graphics.h $(PREFIX)/include
-	@cp -vf  include/ST7735_TFT_Font.h $(PREFIX)/include
-	@cp -vf  include/ST7735_TFT_Print.h $(PREFIX)/include
+	@cp -vf  include/ST7735_TFT* $(PREFIX)/include
+
 	@echo "[DONE!]"
 
 # Uninstall the library
@@ -76,10 +74,7 @@ uninstall:
 	@rm -vf ${LIBDIR}/${LIB}.*
 
 	@echo "[UNINSTALL HEADERS]"
-	@rm -rvf  $(PREFIX)/include/ST7735_TFT.h
-	@rm -rvf  $(PREFIX)/include/ST7735_TFT_graphics.h
-	@rm -rvf  $(PREFIX)/include/ST7735_TFT_Font.h
-	@rm -rvf  $(PREFIX)/include/ST7735_TFT_Print.h
+	@rm -rvf  $(PREFIX)/include/ST7735_TFT*
 	@echo "[DONE!]"
 
 # clear build files
