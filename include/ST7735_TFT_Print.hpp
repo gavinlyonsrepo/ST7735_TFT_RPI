@@ -70,7 +70,7 @@ class Print
     size_t println(unsigned long, int = DEC);
     size_t println(double, int = 2);
     size_t println(void);
-    size_t println(const std::string &s);
+    size_t println(const std::string &);
 };
 
 

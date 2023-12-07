@@ -41,7 +41,9 @@ class ST7735_TFT_graphics : public Print {
 		TFTFont_Tiny = 5,       /**< Tiny font */
 		TFTFont_HomeSpun = 6,   /**< HomeSpun Font */
 		TFTFont_Bignum = 7,     /**< Bignum numbers only */
-		TFTFont_Mednum = 8      /**< Mednum number only */
+		TFTFont_Mednum = 8,      /**< Mednum number only */
+		TFTFont_ArialRound = 9,  /**< Arial round font */
+		TFTFont_ArialBold = 10  /**< Arial bold font */
 	}; 
 
 	/*! Width of the font in bits each representing a bytes sized column*/
@@ -52,7 +54,7 @@ class ST7735_TFT_graphics : public Print {
 		TFTFont_width_5 = 5,   /**< 5 default font */
 		TFTFont_width_7 = 7,   /**< 7 homespun & thick font*/
 		TFTFont_width_8 = 8,   /**< 8 wide font */
-		TFTFont_width_16  = 16 /**< Big and Medium number  font */
+		TFTFont_width_16  = 16 /**< 16 font 7-10*/
 	}; 
 
 	/*! font offset in the ASCII table*/
@@ -66,9 +68,10 @@ class ST7735_TFT_graphics : public Print {
 	/*! Height of the font in bits*/
 	enum TFT_Font_height_e : uint8_t
 	{
-		TFTFont_height_8 = 8,  /**< 8 font  1-6 at size 1*/
-		TFTFont_height_16 = 16, /**< 16 font 8 */
-		TFTFont_height_32 = 32  /**< 32 font 7 */
+		TFTFont_height_8 = 8,  /**< 8 bit font 1-6 at size 1*/
+		TFTFont_height_16 = 16, /**< 16 bit font 8, 10 */
+		TFTFont_height_24 = 24, /**< 24 bit font 9 */
+		TFTFont_height_32 = 32  /**< 32 bit font 7 */
 	}; 
 	
 	virtual size_t write(uint8_t);

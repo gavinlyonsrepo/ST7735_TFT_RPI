@@ -50,7 +50,7 @@ void Test1A(void); // defined 16-bit Colors, text
 void Test1B(void); // print entire ASCII font 0 to 127, default font
 void Test1C(void); // print numbers int and float using draw functions
 void Test1D(void); // print numbers int and float using PRINT function
-void Test1E(void); // Print out font 7-8 using draw functions
+void Test1E(void); // Print out font 7-10 using drawFontNum functions
 void Test2(void);  // font sizes(1-4) + character draw using draw functions
 void Test3(void);  // pixels and lines
 void Test4(void);  // rectangles 
@@ -261,8 +261,7 @@ void Test1D(void){
 	myTFT.TFTsetCursor(50,10); // Test a int with print 
 	myTFT.print(1243);
 	
-	// Test a -int with print inverted size 2
-	myTFT.setTextSize(2);
+	myTFT.setTextSize(2); 	// Test a -int with print inverted size 2
 	myTFT.setTextColor(ST7735_RED, ST7735_YELLOW);
 	myTFT.TFTfillRectangle(5, 23, 120, 17, ST7735_YELLOW);
 	myTFT.TFTsetCursor(5,25);
@@ -285,6 +284,19 @@ void Test1D(void){
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
 	
+	myTFT.TFTsetCursor(10,5); // Test Arial round font 9 
+	myTFT.setTextColor(ST7735_WHITE, ST7735_BLACK);
+	myTFT.TFTFontNum(myTFT.TFTFont_ArialRound);
+	myTFT.print("A round");
+	
+	myTFT.TFTsetCursor(10,50); // Test Arial bold font 10 
+	myTFT.setTextColor(ST7735_WHITE, ST7735_BLACK);
+	myTFT.TFTFontNum(myTFT.TFTFont_ArialBold);
+	myTFT.print("A bold");
+	
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	myTFT.TFTfillScreen(ST7735_BLACK);
+	
 	// Test print with DEC BIN OCT HEX 
 	uint8_t numPos = 47;
 	myTFT.TFTFontNum(myTFT.TFTFont_HomeSpun);
@@ -299,22 +311,49 @@ void Test1D(void){
 	
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
+	
+	// Test print a string object with print
+	std::string timeInfo = "12:45";
+	std::string newLine = "new l";
+	myTFT.TFTsetCursor(5, 5);
+	myTFT.print(timeInfo);
+	// print a new line with println 
+	myTFT.TFTsetCursor(5,40);
+	myTFT.println(newLine); // print a new line feed with println
+	myTFT.print(newLine);
+
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	myTFT.TFTfillScreen(ST7735_BLACK);
 }
 
 void Test1E(void)
 {
-	std::cout << "Test 1E: print out font 7 & 8 using draw functions" << std::endl;
+	std::cout << "Test 1E: print out font 7 - 10 using draw functions" << std::endl;
 	// Note fonts 7 and 8 are numbers only + : 
+	// Note Fonts 9 and 10 are Alphanumeric 
 	char teststr1[] = "12:81";
 	char teststr2[] = "72:83";
+	char teststr3[] = "9 rnd";
+	char teststr4[] = "10 bold";
 	
 	myTFT.TFTFontNum(myTFT.TFTFont_Bignum);
-	myTFT.TFTdrawCharNumFont(0, 0, '6',  ST7735_RED, ST7735_BLACK);
-	myTFT.TFTdrawTextNumFont(0, 40, teststr1, ST7735_YELLOW, ST7735_RED);
+	myTFT.TFTdrawCharNumFont(2, 2, '7',  ST7735_RED, ST7735_BLACK);
+	myTFT.TFTdrawTextNumFont(2, 40, teststr1, ST7735_YELLOW, ST7735_RED);
 	
 	myTFT.TFTFontNum(myTFT.TFTFont_Mednum);
-	myTFT.TFTdrawCharNumFont(0, 75, '7',  ST7735_WHITE, ST7735_BLACK);
-	myTFT.TFTdrawTextNumFont(0, 100, teststr2, ST7735_GREEN, ST7735_RED);
+	myTFT.TFTdrawCharNumFont(2, 75, '8',  ST7735_WHITE, ST7735_BLACK);
+	myTFT.TFTdrawTextNumFont(2, 100, teststr2, ST7735_GREEN, ST7735_RED);
+	
+	TFT_MILLISEC_DELAY(TEST_DELAY5);
+	myTFT.TFTfillScreen(ST7735_BLACK);
+	
+	myTFT.TFTFontNum(myTFT.TFTFont_ArialRound);
+	myTFT.TFTdrawCharNumFont(2, 2, '9',  ST7735_RED, ST7735_BLACK);
+	myTFT.TFTdrawTextNumFont(2, 26, teststr3, ST7735_YELLOW, ST7735_RED);
+	
+	myTFT.TFTFontNum(myTFT.TFTFont_ArialBold);
+	myTFT.TFTdrawCharNumFont(2, 56, 'A',  ST7735_WHITE, ST7735_BLACK);
+	myTFT.TFTdrawTextNumFont(2, 90, teststr4, ST7735_GREEN, ST7735_RED);
 	
 	TFT_MILLISEC_DELAY(TEST_DELAY5);
 	myTFT.TFTfillScreen(ST7735_BLACK);
@@ -349,7 +388,7 @@ void Test3(void)
 }
 
 void Test4(void) {
-	std::cout << "Test 4 & 5: rectangles  and circles" << std::endl;
+	std::cout << "Test 4: rectangles " << std::endl;
 	myTFT.TFTdrawRectWH(5, 5, 20, 20, ST7735_RED);
 	myTFT.TFTfillRectangle(45, 5, 20, 20, ST7735_YELLOW);
 	myTFT.TFTfillRect(85, 5, 20, 20, ST7735_GREEN);
@@ -361,12 +400,12 @@ void Test4(void) {
 }
 
 void Test5(void) {
+	std::cout << "Test 5 & 6: Triangles and circles" << std::endl;
 	myTFT.TFTdrawCircle(40, 20, 15, ST7735_GREEN);
 	myTFT.TFTfillCircle(80, 20, 15, ST7735_YELLOW);
 }
 
 void Test6(void) {
-	std::cout << "Test 6: Triangles" << std::endl;
 	myTFT.TFTdrawTriangle(5, 80, 50, 40, 95, 80, ST7735_CYAN);
 	myTFT.TFTfillTriangle(55, 120, 100, 90, 127, 120, ST7735_RED);
 
@@ -487,6 +526,7 @@ void Test11(void)
 	struct tm *timenow;
 	char value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 	uint16_t count=CLOCK_DISPLAY_TIME;
+	if (count > 999) count = 999; 
 	char myStr[5];
 	char teststr1[] = "G Lyons";
 	
@@ -508,7 +548,7 @@ void Test11(void)
 		time(&now);
 		timenow = localtime(&now); 
 		count--; 
-		sprintf(myStr, "%03d", count);
+		snprintf(myStr, sizeof(myStr), "%03u", count);
 		
 		myTFT.TFTdrawCharNumFont(0, 45, value[timenow->tm_hour / 10],ST7735_RED, ST7735_BLACK);
 		myTFT.TFTdrawCharNumFont(16, 45, value[timenow->tm_hour % 10],ST7735_RED, ST7735_BLACK);

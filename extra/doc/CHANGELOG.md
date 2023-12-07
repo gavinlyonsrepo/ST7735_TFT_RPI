@@ -35,4 +35,7 @@
 	* Added Doxygen style comments for software API generation.
 	* h files change to hpp files.
 	* Enums made part of relevant class. 
-	* font and bitmp data placed in Cpp files.
+	* font and bitmap data placed in Cpp files.
+* Version 1.7 December 2023
+	* Added Fonts 9 & 10 Arial Bold and Arial Round
+	* Added test for println String object.

@@ -1,18 +1,20 @@
 # Gavin lyons 06-2021 
 # Makefile to build example program for ST7735_TFT_RPI library.
 # URL: https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
-# Options
-# 1. make = create test file by bin/test from src/main.cpp , 
+
+# === Options ===
+# 1. make = create test file at bin/test from src/main.cpp , 
 # 2. make clean = deletes .o files generated (by step 1) from build directory
-# 3. make run = run test file (made by step 1), sudo bin/test
+# 3. make run = run test file (made by step 1), "sudo bin/test"
+# ==============
 
 # ************************************************
 # User SRC directory Option Section
-# pick on example "SRC" dir and ONE ONLY.
+# Pick ONE example "SRC" dir and ONE ONLY.
 # Comment out the others. #
 
-SRC=src/Tests
-#SRC=src/Hello_world
+SRC=src/Hello_world
+#SRC=src/Tests
 #SRC=src/Frame_rate_test
 # ************************************************
 
