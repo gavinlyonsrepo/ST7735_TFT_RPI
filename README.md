@@ -37,11 +37,11 @@
 
 * Author: Gavin Lyons
 * Port of my PIC library at [github link.](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
-* Created: May 2021
-* Developed on
+
+* Development ToolChain 
     1. Raspberry PI 3 model b
     2. C++ g++ (Raspbian 8.3.0-6+rpi1) 8.3.0
-    3. Raspbian 10 Buster OS , armv7l Linux 5.10.63-v7
+    3. Raspbian 10 Buster OS , armv7l Linux 5.10.63-v7. 32 bit. 
     4. bcm2835 Library 1.68
 
 ## Installation
