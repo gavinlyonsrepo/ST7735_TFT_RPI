@@ -18,6 +18,8 @@
       * [Bitmap](#bitmap)  
   * [Hardware](#hardware)
   * [Output](#output)
+  * [Notes and Issues](#notes-and-issues)
+	* [Compilation problems](#compilation-problems)
 
 ## Overview
 
@@ -252,3 +254,12 @@ Output of some of the test routine's. Left to right, top to bottom.
 
 ![ pic ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/9.jpg)
 ![ pic1 ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/4.jpg)
+
+
+### Compilation problems
+
+Note the toolchain used in overview section, If you have trouble compiling on other 
+platforms or OS. For example 64-bit OS, user may need to remove or edit
+some of the CCFLAGS in root directory Makefile to allow for Compilation, if you see them throwing errors
+See [pull request on SSD1306 project](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI/pull/2) for details.
+Will upgrade in future release.
