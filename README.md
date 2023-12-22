@@ -255,6 +255,7 @@ Output of some of the test routine's. Left to right, top to bottom.
 ![ pic ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/9.jpg)
 ![ pic1 ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/4.jpg)
 
+## Notes and Issues
 
 ### Compilation problems
 
