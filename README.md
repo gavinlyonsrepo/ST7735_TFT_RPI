@@ -275,9 +275,11 @@ Output of some of the test routine's. Left to right, top to bottom.
 7. Clock Demo showing icons, small bitmaps and font 7 "BigNums"
 8. 24-bit color bitmap test image
 9. 16-bit color bitmap test image
+10. Fonts 7-12
 
 ![ pic ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/9.jpg)
 ![ pic1 ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/4.jpg)
+![ p2](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/5.jpg)
 
 ## Notes and Issues
 
