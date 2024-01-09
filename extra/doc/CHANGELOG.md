@@ -39,3 +39,11 @@
 * Version 1.7 December 2023
 	* Added Fonts 9 & 10 Arial Bold and Arial Round
 	* Added test for println String object.
+* Version 1.7.1 Jan 2023
+	* Changed Makefile so library complies on 64-bit systems without error.
+	* Added Fonts 11 & 12 Mia and Dedica
+	* Updated Fonts 7 & 8 to 14 characters from 11
+	* Added Software SPI comm delay class member.
+	* Changed HW SPI settings function so it can be called outside of Init.
+	* Added return value to begin, bitmap and most text write functions.
+	* Improved Error handling , including check for ASCII character out of fonts range.
