@@ -1,33 +1,36 @@
 /*!
 	@file     ST7735_TFT.cpp
 	@author   Gavin Lyons
-	@brief    Source file for ST7735_TFT_RPI library. 
-	Contains driver methods for ST7735_TFT display 
-
+	@brief    Source file for ST7735_TFT_RPI library.
+		Contains driver methods for ST7735_TFT display
 	@note  See URL for full details.https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
-		
+
 */
 
 #include "ST7735_TFT.hpp"
- 
-/*! @brief Constructor for class ST7735_TFT */ 
+
+/*! @brief Constructor for class ST7735_TFT */
 ST7735_TFT :: ST7735_TFT(){}
 
+
 /*!
-	@brief  Init Hardware SPI
-*/
-void ST7735_TFT::TFTSPIInitialize(void)
-{
-	bcm2835_spi_begin();
+	@brief  Init Hardware SPI settings
+	@details MSBFIRST, mode 0 , SPI Speed , SPICEX pin
+	@note If multiple devices on SPI bus with different settings , 
+	can be used to refresh ST7735 settings
 	
+*/
+void ST7735_TFT::TFTSPIHWSettings(void)
+{
+
 	bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);
 	bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-	
+
 	if (_hertz > 0)
 		bcm2835_spi_setClockDivider(bcm2835_aux_spi_CalcClockDivider(_hertz));
 	else //SPI_CLOCK_DIVIDER_32 = 7.8125MHz on Rpi2, 12.5MHz on RPI3
-		bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32); 
-	
+		bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_32);
+
 	if (_SPICEX_pin == 0)
 	{
 		bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
@@ -41,9 +44,8 @@ void ST7735_TFT::TFTSPIInitialize(void)
 
 /*!
 	@brief Call when powering down TFT
-	
-	@note Turns off Display Sets GPIO low and turns off SPI 
-	End SPI operations. SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK), 
+	@note Turns off Display Sets GPIO low and turns off SPI
+	End SPI operations. SPI0 pins P1-19 (MOSI), P1-21 (MISO), P1-23 (CLK),
 	P1-24 (CE0) and P1-26 (CE1) are returned to their default INPUT behavior.
 */
 void ST7735_TFT ::TFTPowerDown(void)
@@ -51,15 +53,15 @@ void ST7735_TFT ::TFTPowerDown(void)
 	TFTchangeMode(TFT_Display_off_mode);
 	TFT_DC_SetLow;
 	TFT_RST_SetLow;
-	
+
 if (_hardwareSPI == false)
 {
 	TFT_SCLK_SetLow;
 	TFT_SDATA_SetLow;
 	TFT_CS_SetLow;
-}else{ 
+}else{
 	bcm2835_spi_end();
-	} 
+	}
 }
 
 /*!
@@ -68,32 +70,41 @@ if (_hardwareSPI == false)
 void ST7735_TFT ::TFTResetPIN() {
 	TFT_RST_SetDigitalOutput;
 	TFT_RST_SetHigh;
-	TFT_MILLISEC_DELAY(10);
+	TFT_MILLISEC_DELAY(TFT_RESET_DELAY);
 	TFT_RST_SetLow;
-	TFT_MILLISEC_DELAY(10);
+	TFT_MILLISEC_DELAY(TFT_RESET_DELAY);
 	TFT_RST_SetHigh;
-	TFT_MILLISEC_DELAY(10);
+	TFT_MILLISEC_DELAY(TFT_RESET_DELAY);
 }
 
 /*!
-	@brief  sets up TFT GPIO
-	@param rst reset GPIO 
+	@brief  sets up TFT GPIO for Hardware SPi
+	@param rst reset GPIO
 	@param dc data or command GPIO.
-	@param cs chip select GPIO   -> Software SPI only set to -1 for HW SPI
-	@param sclk Data clock GPIO  -> Software SPI only set to -1 for HW SPI
-	@param din Data to TFT GPIO  -> Software SPI only set to -1 for HW SPI
+	@note overloaded 2 off, 1 for HW SPI , 1 for SW SPI 
+*/
+void ST7735_TFT ::TFTSetupGPIO(int8_t rst, int8_t dc)
+{
+	_hardwareSPI = true;
+	_TFT_RST= rst;
+	_TFT_DC = dc;
+}
+
+/*!
+	@brief  sets up TFT GPIO for software SPI
+	@param rst reset GPIO
+	@param dc data or command GPIO.
+	@param cs chip select GPIO
+	@param sclk Data clock GPIO
+	@param din Data to TFT GPIO
+	@note overloaded 2 off, 1 for HW SPI , 1 for SW SPI 
 */
 void ST7735_TFT ::TFTSetupGPIO(int8_t rst, int8_t dc, int8_t cs, int8_t sclk, int8_t din)
 {
-if((cs != -1) && (sclk != -1) && (din != -1))
-{
-	_TFT_CS = cs;
-	_TFT_SDATA = din;  
-	_TFT_SCLK = sclk;
 	_hardwareSPI = false;
-}else{
-	_hardwareSPI = true;
-}
+	_TFT_CS = cs;
+	_TFT_SDATA = din;
+	_TFT_SCLK = sclk;
 	_TFT_RST= rst;
 	_TFT_DC = dc;
 }
@@ -101,8 +112,9 @@ if((cs != -1) && (sclk != -1) && (din != -1))
 
 /*!
 	@brief init sub-routine ST7735R Green Tab
+	@return 0 = success, 2=bcm2835_spi_begin has failed
 */
-void ST7735_TFT ::TFTGreenTabInitialize() {
+uint8_t ST7735_TFT ::TFTGreenTabInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
 	TFT_DC_SetDigitalOutput;
@@ -114,20 +126,23 @@ if (_hardwareSPI == false){
 	TFT_SCLK_SetDigitalOutput;
 	TFT_SDATA_SetDigitalOutput;
 }else{
-	TFTSPIInitialize();
+	if (!bcm2835_spi_begin())
+		return 2;
+	TFTSPIHWSettings();
 }
 	Rcmd1();
 	Rcmd2green();
 	Rcmd3();
 	TFT_PCBtype = TFT_ST7735R_Green;
+	return 0;
 }
 
 /*!
 	@brief init sub-routine ST7735R Green Tab
 */
 void ST7735_TFT ::Rcmd2green() {
-	uint8_t seq1[] {0x00, 0x02, 0x00, (0x7F + 0x02)}; 
-	uint8_t seq2[] {0x00, 0x01, 0x00, (0x9F + 0x01)}; 
+	uint8_t seq1[] {0x00, 0x02, 0x00, (0x7F + 0x02)};
+	uint8_t seq2[] {0x00, 0x01, 0x00, (0x9F + 0x01)};
 	writeCommand(ST7735_CASET);
 	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_RASET);
@@ -137,8 +152,9 @@ void ST7735_TFT ::Rcmd2green() {
 
 /*!
 	@brief ST7735R Red Tab Init Red PCB version
+	@return 0 = success, 2=bcm2835_spi_begin has failed
 */
-void ST7735_TFT ::TFTRedTabInitialize() {
+uint8_t ST7735_TFT ::TFTRedTabInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
 	TFT_DC_SetDigitalOutput;
@@ -151,19 +167,22 @@ if (_hardwareSPI == false)
 	TFT_SCLK_SetDigitalOutput;
 	TFT_SDATA_SetDigitalOutput;
 }else{
-	TFTSPIInitialize();
+	if (!bcm2835_spi_begin())
+		return 2;
+	TFTSPIHWSettings();
 }
 	Rcmd1();
 	Rcmd2red();
 	Rcmd3();
 	TFT_PCBtype = TFT_ST7735R_Red;
-
+	return 0;
 }
 
 /*!
 	@brief Init Routine ST7735R Black Tab (ST7735S)
+	@return 0 = success, 2=bcm2835_spi_begin has failed
 */
-void ST7735_TFT ::TFTBlackTabInitialize() {
+uint8_t ST7735_TFT ::TFTBlackTabInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
 	TFT_DC_SetDigitalOutput;
@@ -176,7 +195,9 @@ if (_hardwareSPI == false)
 	TFT_SCLK_SetDigitalOutput;
 	TFT_SDATA_SetDigitalOutput;
 }else{
-	TFTSPIInitialize();
+	if (!bcm2835_spi_begin())
+		return 2;
+	TFTSPIHWSettings();
 }
 	Rcmd1();
 	Rcmd2red();
@@ -184,12 +205,14 @@ if (_hardwareSPI == false)
 	writeCommand(ST7735_MADCTL);
 	writeData(0xC0);
 	TFT_PCBtype = TFT_ST7735S_Black ;
+	return 0;
 }
 
 /*!
 	@brief init routine for ST7735B controller
+	@return 0 = success, 2=bcm2835_spi_begin has failed
 */
-void ST7735_TFT ::TFTST7735BInitialize() {
+uint8_t ST7735_TFT ::TFTST7735BInitialize() {
 	TFTResetPIN();
 	TFT_DC_SetLow;
 	TFT_DC_SetDigitalOutput;
@@ -202,10 +225,13 @@ if (_hardwareSPI == false)
 	TFT_SCLK_SetDigitalOutput;
 	TFT_SDATA_SetDigitalOutput;
 }else{
-	TFTSPIInitialize();
+	if (!bcm2835_spi_begin())
+		return 2;
+	TFTSPIHWSettings();
 }
 	Bcmd();
 	TFT_PCBtype = TFT_ST7735B ;
+	return 0;
 }
 
 
@@ -213,10 +239,10 @@ if (_hardwareSPI == false)
 	@brief init sub-routine for ST7735B controller
 */
 void ST7735_TFT ::Bcmd() {
-	uint8_t seq6[] {0x09, 0x16, 0x09, 0x20, 0x21, 0x1B, 0x13, 0x19, 0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E}; 
-	uint8_t seq7[] {0x0B, 0x14, 0x08, 0x1E, 0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F}; 
-	uint8_t seq8[] {0x00, 0x02, 0x08 , 0x81}; 
-	uint8_t seq9[] {0x00, 0x01, 0x08 , 0xA0}; 
+	uint8_t seq6[] {0x09, 0x16, 0x09, 0x20, 0x21, 0x1B, 0x13, 0x19, 0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E};
+	uint8_t seq7[] {0x0B, 0x14, 0x08, 0x1E, 0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F};
+	uint8_t seq8[] {0x00, 0x02, 0x08 , 0x81};
+	uint8_t seq9[] {0x00, 0x01, 0x08 , 0xA0};
 	writeCommand(ST7735_SWRESET);
 	TFT_MILLISEC_DELAY(50);
 	writeCommand(ST7735_SLPOUT);
@@ -272,15 +298,15 @@ void ST7735_TFT ::Bcmd() {
 	@brief init sub-routine
 */
 void ST7735_TFT ::Rcmd1() {
-	
+
 	uint8_t seq1[] { 0x01, 0x2C, 0x2D };
-	uint8_t seq3[] { 0xA2, 0x02, 0x84 }; 
+	uint8_t seq3[] { 0xA2, 0x02, 0x84 };
 	writeCommand(ST7735_SWRESET);
 	TFT_MILLISEC_DELAY(150);
 	writeCommand(ST7735_SLPOUT);
 	TFT_MILLISEC_DELAY(500);
 	writeCommand(ST7735_FRMCTR1);
-	
+
 	spiWriteDataBuffer(seq1, sizeof(seq1));
 	writeCommand(ST7735_FRMCTR2);
 	spiWriteDataBuffer(seq1, sizeof(seq1));
@@ -328,10 +354,10 @@ void ST7735_TFT ::Rcmd2red() {
 */
 void ST7735_TFT ::Rcmd3() {
 	writeCommand(ST7735_GMCTRP1);
-	uint8_t seq4[] {0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10}; 
+	uint8_t seq4[] {0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10};
 	spiWriteDataBuffer(seq4, sizeof(seq4));
 	writeCommand(ST7735_GMCTRN1);
-	uint8_t seq5[] {0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10}; 
+	uint8_t seq5[] {0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10};
 	spiWriteDataBuffer(seq5, sizeof(seq5));
 	writeCommand(ST7735_NORON);
 	TFT_MILLISEC_DELAY(10);
@@ -405,7 +431,7 @@ void ST7735_TFT ::TFTchangeInvertMode(bool invertModeOn) {
 	@brief This changes the mode of the display as:
 	@param mode enum TFT_mode value
 		-# TFT_Normal_mode: Normal mode.
-		-# TFT_Partial_mode: Enable partial mode to work in portions of display 
+		-# TFT_Partial_mode: Enable partial mode to work in portions of display
 		-# TFT_Idle_mode: Idle_mode consume less current and shows less color
 		-# TFT_Sleep_mode: Put display driver section in sleep but rest of the logic works.
 		-# TFT_Invert_mode: invert the display
@@ -415,47 +441,47 @@ void ST7735_TFT ::TFTchangeInvertMode(bool invertModeOn) {
 void ST7735_TFT ::TFTchangeMode(TFT_modes_e mode) {
 	switch (mode) {
 		case TFT_Normal_mode:
-			if (_currentMode ==  TFT_Display_off_mode) {//was in off display?
+			if (TFT_mode ==  TFT_Display_off_mode) {//was in off display?
 				writeCommand(ST7735_DISPON);
 			}
-			if (_currentMode == TFT_Idle_mode) {//was in idle?
+			if (TFT_mode == TFT_Idle_mode) {//was in idle?
 				writeCommand(ST7735_TFT_Idle_modeOF);
 			}
-			if (_currentMode == TFT_Sleep_mode) {//was in sleep?
+			if (TFT_mode == TFT_Sleep_mode) {//was in sleep?
 				writeCommand(ST7735_SLPOUT);
 				TFT_MILLISEC_DELAY(120);
 			}
-			if (_currentMode == TFT_Invert_mode) {//was inverted?
-				_currentMode = TFT_Normal_mode;
+			if (TFT_mode == TFT_Invert_mode) {//was inverted?
+				TFT_mode = TFT_Normal_mode;
 				writeCommand(ST7735_INVOFF);
 			}
 			writeCommand(ST7735_NORON);
-			_currentMode = TFT_Normal_mode;
+			TFT_mode = TFT_Normal_mode;
 			break;
 		case TFT_Partial_mode:
 			writeCommand(ST7735_PTLON);
-			_currentMode = TFT_Partial_mode;
+			TFT_mode = TFT_Partial_mode;
 			break;
 		case TFT_Idle_mode:
 			writeCommand(ST7735_TFT_Idle_modeON);
-			_currentMode = TFT_Idle_mode;
+			TFT_mode = TFT_Idle_mode;
 			break;
 		case TFT_Sleep_mode:
 			writeCommand(ST7735_SLPIN);
-			_currentMode = TFT_Sleep_mode;
+			TFT_mode = TFT_Sleep_mode;
 			TFT_MILLISEC_DELAY(5);
 			return;
 		case TFT_Invert_mode:
 			writeCommand(ST7735_INVON);
-			_currentMode = TFT_Invert_mode;
+			TFT_mode = TFT_Invert_mode;
 			break;
 		case TFT_Display_on_mode:
 			writeCommand(ST7735_DISPON);
-			_currentMode = TFT_Display_on_mode;
+			TFT_mode = TFT_Display_on_mode;
 			break;
 		case TFT_Display_off_mode:
 			writeCommand(ST7735_DISPOFF);
-			_currentMode =  TFT_Display_off_mode;
+			TFT_mode =  TFT_Display_off_mode;
 			break;
 	}//switch
 }
@@ -474,8 +500,7 @@ void ST7735_TFT ::TFTchangeMode(TFT_modes_e mode) {
 void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 	uint8_t madctl = 0;
 
-	_rotation = mode % 4;
-	switch (_rotation) {
+	switch (mode) {
 		case TFT_Degrees_0 :
 			if (TFT_PCBtype == TFT_ST7735S_Black ){
 				madctl = ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB;
@@ -523,6 +548,7 @@ void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 			_heightTFT = _widthStartTFT;
 			break;
 	}
+	TFT_rotate = mode;
 	writeCommand(ST7735_MADCTL);
 	writeData(madctl);
 }
@@ -537,11 +563,11 @@ void ST7735_TFT ::TFTsetRotation(TFT_rotate_e mode) {
 */
 void ST7735_TFT  :: TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint16_t width_TFT, uint16_t height_TFT)
 {
-	_colstart = colOffset; 
+	_colstart = colOffset;
 	_rowstart = rowOffset;
-	_XStart = colOffset; 
+	_XStart = colOffset;
 	_YStart = rowOffset;
-	
+
 	_widthTFT = width_TFT;
 	_heightTFT = height_TFT;
 	_widthStartTFT = width_TFT;
@@ -549,21 +575,69 @@ void ST7735_TFT  :: TFTInitScreenSize(uint8_t colOffset, uint8_t rowOffset, uint
 }
 
 /*!
-	@brief intialise PCBtype and SPI
+	@brief intialise PCBtype and SPI,  Hardware SPI
 	@param pcbType 4 choices 0-3
 	@param hertz  SPI Clock frequency in Hz, HW SPI only MAX 125 Mhz , MIN 30Khz(RPI3). typical/tested 8000000
 	@param SPICE_Pin which SPI CE/CS pin to use 0 = SPICE0 GPIO08 RPI3, 1 = SPICE1 GPIO07 RPI3
-	@return 0 = success, -1 = wrong pcb_type passed
+	@return 0 = success, 2 SPI incorrect . 3 = wrong pcb_type, 4=bcm2835_spi_begin has failed
+	@note @note overloaded 2 off, 1 for HW SPI , 1 for SW SPI 
 */
-int8_t ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz, uint8_t SPICE_Pin)
+uint8_t ST7735_TFT::TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz, uint8_t SPICE_Pin)
 {
-	if (_hardwareSPI == true)
+	if (SPICE_Pin >= 2)
 	{
-		_hertz = hertz;
-		_SPICEX_pin = SPICE_Pin;
+		std::cout << "Error:TFTInitPCBType 2: SPICE_PIN value incorrect :" << SPICE_Pin <<std::endl;
+		return  2;
 	}
-	uint8_t choice = pcbType;
-	switch(choice)
+	
+	_SPICEX_pin = SPICE_Pin;
+	_hertz = hertz;
+	bool initErrorFlag = false;
+	
+	switch(pcbType)
+	{
+		case TFT_ST7735R_Red :
+			if(TFTRedTabInitialize() != 0)
+				initErrorFlag = true;
+		break;
+		case TFT_ST7735R_Green:
+			if(TFTGreenTabInitialize() != 0)
+				initErrorFlag = true;
+		break;
+		case TFT_ST7735S_Black:
+			if(TFTBlackTabInitialize() != 0)
+				initErrorFlag = true;
+		break;
+		case TFT_ST7735B :
+			if(TFTST7735BInitialize() != 0)
+				initErrorFlag = true;
+		break;
+		default:
+			std::cout << "Error:TFTInitPCBType 3: Wrong input pcb type:" << pcbType<<std::endl;
+			return 3;
+		break;
+	}
+	
+	if(initErrorFlag)
+	{
+		std::cout << "Error:TFTInitPCBType 4:  bcm2835_spi_begin :Cannot start spi, Running as root?" << std::endl;
+		return 4;
+	}
+	
+	return 0;
+}
+
+/*!
+	@brief intialise PCBtype and SPI, SOftware SPI
+	@param pcbType 4 choices 0-3
+	@param CommDelay uS GPIO delay used in software SPI
+	@return 0 = success, 2 = wrong pcb_type passed
+	@@note overloaded 2 off, 1 for HW SPI , 1 for SW SPI 
+*/
+uint8_t ST7735_TFT::TFTInitPCBType(TFT_PCBtype_e pcbType, uint16_t CommDelay)
+{
+	HighFreqDelaySet(CommDelay);
+	switch(pcbType)
 	{
 		case TFT_ST7735R_Red : TFTRedTabInitialize(); break;
 		case TFT_ST7735R_Green: TFTGreenTabInitialize(); break;
@@ -571,11 +645,28 @@ int8_t ST7735_TFT  ::TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz, uint8
 		case TFT_ST7735B : TFTST7735BInitialize(); break;
 		default:
 			std::cout << "Error:TFTInitPCBType: Wrong input pcb type:" << pcbType<<std::endl;
-			return -1;
+			return 2;
 		break;
 	}
 	return 0;
 }
 
+/*!
+	@brief Library version number getter
+	@return The lib version number eg 171 = 1.7.1
+*/
+uint16_t ST7735_TFT::TFTLibVerNumGet(void) {return _LibVersionNum;}
+
+/*!
+	@brief Freq delay used in SW SPI getter, uS delay used in SW SPI method
+	@return The  GPIO communications delay in uS
+*/
+uint16_t ST7735_TFT::HighFreqDelayGet(void){return _HighFreqDelay;}
+
+/*!
+	@brief Freq delay used in SW SPI setter, uS delay used in SW SPI method
+	@param CommDelay The GPIO communications delay in uS
+*/
+void  ST7735_TFT::HighFreqDelaySet(uint16_t CommDelay){_HighFreqDelay = CommDelay;}
 
 //**************** EOF *****************

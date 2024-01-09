@@ -3,22 +3,18 @@
 	@author   Gavin Lyons
 	@brief    Library header file for ST7735_TFT_RPI library.
 				Contains driver methods for ST7735_TFT display
-
 	@note  See URL for full details.https://github.com/gavinlyonsrepo/ST7735_TFT_RPI
-		
 */
 
 #pragma once
 
-// Section Libraries 
-#include <bcm2835.h>
+// Section Libraries
 #include <iostream>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-
-#include "ST7735_TFT_graphics.hpp" // Custom
-
+#include <cstdint>
+#include <cstdbool>
+#include <cstring>
+#include <bcm2835.h> // Dependency
+#include "ST7735_TFT_graphics.hpp"
 
 // Section:  Defines
 
@@ -42,7 +38,7 @@
 #define ST7735_TFT_Idle_modeON 0x39 /**< Idle Mode ON */
 #define ST7735_TFT_Idle_modeOF  0x38 /**< Idle Mode OFF */
 
-// ST7735 Addressing 
+// ST7735 Addressing
 #define ST7735_CASET   0x2A /**< Column address set */
 #define ST7735_RASET   0x2B /**<  Page address set */
 #define ST7735_RAMWR   0x2C /**< Memory write */
@@ -80,7 +76,7 @@
 #define ST7735_GMCTRP1 0xE0 /**< Positive Gamma Correction Setting */
 #define ST7735_GMCTRN1 0xE1 /**< Negative Gamma Correction Setting */
 
-// Memory Access Data Control  Register 
+// Memory Access Data Control  Register
 #define ST7735_MADCTL_MY 0x80 /**< Row Address Order */
 #define ST7735_MADCTL_MX 0x40 /**< Column Address Order */
 #define ST7735_MADCTL_MV 0x20 /**< Row/Column Order (MV) */
@@ -110,7 +106,7 @@
 #define TFT_DC_SetLow  bcm2835_gpio_write(_TFT_DC, LOW)
 #define TFT_RST_SetHigh  bcm2835_gpio_write(_TFT_RST, HIGH)
 #define TFT_RST_SetLow  bcm2835_gpio_write(_TFT_RST, LOW)
-#define TFT_CS_SetHigh bcm2835_gpio_write(_TFT_CS, HIGH) 
+#define TFT_CS_SetHigh bcm2835_gpio_write(_TFT_CS, HIGH)
 #define TFT_CS_SetLow bcm2835_gpio_write(_TFT_CS, LOW)
 #define TFT_SCLK_SetHigh bcm2835_gpio_write(_TFT_SCLK, HIGH)
 #define TFT_SCLK_SetLow  bcm2835_gpio_write(_TFT_SCLK, LOW)
@@ -119,17 +115,16 @@
 
 #define TFT_DC_SetDigitalOutput bcm2835_gpio_fsel(_TFT_DC, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_RST_SetDigitalOutput bcm2835_gpio_fsel(_TFT_RST, BCM2835_GPIO_FSEL_OUTP)
-#define TFT_SCLK_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SCLK, BCM2835_GPIO_FSEL_OUTP) 
+#define TFT_SCLK_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SCLK, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_SDATA_SetDigitalOutput bcm2835_gpio_fsel(_TFT_SDATA, BCM2835_GPIO_FSEL_OUTP)
 #define TFT_CS_SetDigitalOutput bcm2835_gpio_fsel(_TFT_CS, BCM2835_GPIO_FSEL_OUTP)
 
 // Delays
 #define TFT_MILLISEC_DELAY bcm2835_delay
 #define TFT_MICROSEC_DELAY bcm2835_delayMicroseconds
-#define TFT_HIGHFREQ_DELAY 0 // Optional Software SPI delay uS
+#define TFT_RESET_DELAY 10 /**< Reset delay in mS*/
 
-
-/*! 
+/*!
 	@brief Class to control ST7735 TFT basic functionality.
 */
 class ST7735_TFT : public ST7735_TFT_graphics
@@ -139,11 +134,11 @@ public:
 
 	ST7735_TFT();
 	~ST7735_TFT(){};
-	
+
 	//  Enums
 
 	/*! TFT display modes */
-	enum TFT_modes_e : uint8_t 
+	enum TFT_modes_e : uint8_t
 	{
 		TFT_Normal_mode = 0,  /**< In this mode, the display is able to show maximum 262*/
 		TFT_Partial_mode,  /**< In this mode part of the display is used with maximum 262*/
@@ -151,7 +146,7 @@ public:
 		TFT_Sleep_mode, /**<  In this mode, the DC: DC converter, internal oscillator and panel driver circuit are stopped. Only the MCU interface and
 						memory works with VDDI power supply. Contents of the memory are safe.*/
 		TFT_Invert_mode, /**< Invert display colors */
-		TFT_Display_on_mode, 
+		TFT_Display_on_mode,  /**< Turn Display on */
 		TFT_Display_off_mode /**< In this mode, both VDD and VDDI are removed.*/
 	};
 
@@ -162,46 +157,64 @@ public:
 		TFT_Degrees_90,    /**< Rotation 90 degrees*/
 		TFT_Degrees_180,   /**< Rotation 180 degrees*/
 		TFT_Degrees_270   /**< Rotation 270 degrees*/
-	}; 
+	};
 
 	/*! TFT type type of PCB */
-	enum TFT_PCBtype_e: uint8_t 
+	enum TFT_PCBtype_e: uint8_t
 	{
 		TFT_ST7735R_Red = 0, /**<  ST7735R Red Tab  */
 		TFT_ST7735R_Green,   /**<  ST7735R Green Tab */
 		TFT_ST7735S_Black,   /**<  ST7735S Black Tab */
 		TFT_ST7735B,         /**<  ST7735B controller */
-	}; 
+	};
+ 
+	TFT_modes_e TFT_mode;                     /**< Enum to hold display mode */
+	TFT_rotate_e TFT_rotate = TFT_Degrees_0; /**< Enum to hold rotation */
+	TFT_PCBtype_e TFT_PCBtype;               /**< Enum to hold TFT type  */
 
-	TFT_modes_e TFT_mode;       /**< Enum to hold display mode */
-	TFT_PCBtype_e TFT_PCBtype;  /**< Enum to hold TFT type  */
-	
-	void TFTSetupGPIO(int8_t, int8_t, int8_t, int8_t, int8_t);
+	// Functions
+	//Setup related
+	void TFTSetupGPIO(int8_t, int8_t, int8_t, int8_t, int8_t); //SW SPI
+	void TFTSetupGPIO(int8_t, int8_t); // HW SPI
 	void TFTInitScreenSize(uint8_t xOffset, uint8_t yOffset, uint16_t w, uint16_t h);
-	int8_t TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz = 0, uint8_t SPICE_Pin = 0 );
+	uint8_t TFTInitPCBType(TFT_PCBtype_e pcbType, uint16_t CommDelay); // SW SPI
+	uint8_t TFTInitPCBType(TFT_PCBtype_e pcbType, uint32_t hertz = 0, uint8_t SPICE_Pin = 0 ); // HW SPI
+	uint16_t TFTLibVerNumGet(void);
+
+	// SPI related
+	uint16_t HighFreqDelayGet(void);
+	void HighFreqDelaySet(uint16_t);
+	void TFTSPIHWSettings(void);
 	void TFTPowerDown(void);
-	
+	// Screen related
 	void TFTsetRotation(TFT_rotate_e r);
 	void TFTchangeInvertMode(bool invertModeOn);
 	void TFTchangeMode(TFT_modes_e m);
 	void TFTsetScrollDefinition(uint8_t th, uint8_t tb, bool sd);
 	void TFTVerticalScroll(uint8_t vsp);
-	
+
 private:
 
 	void TFTResetPIN(void);
-	void TFTSPIInitialize(void);
-	void TFTST7735BInitialize(void);
-	void TFTGreenTabInitialize(void);
-	void TFTBlackTabInitialize(void);
-	void TFTRedTabInitialize(void);
+	uint8_t TFTST7735BInitialize(void);
+	uint8_t TFTGreenTabInitialize(void);
+	uint8_t TFTBlackTabInitialize(void);
+	uint8_t TFTRedTabInitialize(void);
 	void Rcmd1(void);
 	void Rcmd2red(void);
 	void Rcmd3(void);
 	void Bcmd(void);
 	void Rcmd2green(void);
+
+	//screen 
+	uint8_t _colstart;        /**< Used to offset column in the event of defect at edge of screen */
+	uint8_t _rowstart;        /**< Used to offset row in the event of defect at edge of screen */
+	uint16_t _widthStartTFT; /**<  never change after first init */
+	uint16_t _heightStartTFT; /**< never change after first init */
 	
-	uint8_t  _rotation = 0; /**< variable to hold Rotation mode 0-3*/
+	const uint16_t _LibVersionNum = 171; /**< library version number 171 1.7.1*/
+
+	//SPI
 	uint32_t _hertz;        /**< Spi freq in Hertz , MAX 125 Mhz MIN 30Khz */
 	uint8_t  _SPICEX_pin;  /**< value = X , which SPI_CE pin to use */
 

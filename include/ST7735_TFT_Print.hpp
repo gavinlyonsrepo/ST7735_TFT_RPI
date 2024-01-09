@@ -1,16 +1,15 @@
 /*!
 	@file     ST7735_TFT_Print.hpp
 	@brief    Base class that provides print() and println() for ST7735_TFT_RPI library
-
 	@note  Port of arduino built-in print class, G Lyons 2022.
-		
 */
 
 #pragma once
 
-#include <inttypes.h>
-#include <stdio.h> // for size_t
-#include <string.h>
+#include <cinttypes>
+#include <cstdio> // for size_t
+#include <cstring>
+#include <cmath>
 #include <string>
 
 #define DEC 10

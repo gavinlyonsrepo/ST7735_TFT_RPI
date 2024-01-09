@@ -1,14 +1,15 @@
 /*! 
 	@file src/Frame_rate_test/main.cpp
-	@brief Frame rate test FPS  
-	@author Gavin Lyons.
+	@brief Frame rate test. FPS Bitmaps
 	@note See USER OPTIONS 1-3 in SETUP function
-	@test Test 20: Frame rate test FPS test
+	@details This test is etup fro a 128by160 screen
+	@test 
+		-# Test 701 Frame rate per second (FPS) test. bitmaps.
 */
 
 // Section ::  libraries 
 #include <bcm2835.h> // for SPI GPIO and delays.
-#include <time.h> // for test FPS
+#include <ctime> // for test FPS
 #include "ST7735_TFT.hpp"
 
 // Section :: Defines   
@@ -33,8 +34,7 @@ uint8_t* loadImage(char* name); // Utility for FPS test
 
 int main(void) 
 {
-
-	if(!Setup())return -1;
+	if(Setup() != 0)return -1;
 	TestFPS();
 	EndTests();
 	return 0;
@@ -46,22 +46,19 @@ int main(void)
 
 int8_t Setup(void)
 {
-
-	TFT_MILLISEC_DELAY(TEST_DELAY1);
-	std::cout << "TFT FPS Test Start!" << std::endl;
+	std::cout << "TFT Start" << std::endl;
 	if(!bcm2835_init())
 	{
-		std::cout << "Error : Problem with init bcm2835 library" << std::endl;
-		return -1;
+		std::cout << "Error 1201 Problem with init bcm2835 library" << std::endl;
+		return 2;
+	}else{
+		std::cout <<"bcm2835 library version :" << bcm2835_version() << std::endl;
 	}
 	
 // ** USER OPTION 1 GPIO/SPI TYPE HW OR SW **
 	int8_t RST_TFT  =  25;
 	int8_t DC_TFT   =  24;
-	int8_t SCLK_TFT =  -1; // 5, change to GPIO no for sw spi, -1 hw spi
-	int8_t SDIN_TFT =  -1; // 6, change to GPIO no for sw spi, -1 hw spi
-	int8_t CS_TFT   =  -1; // 8, change to GPIO no for sw spi, -1 hw spi
-	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT, CS_TFT, SCLK_TFT, SDIN_TFT);
+	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT);
 //*********************************************
 
 // ** USER OPTION 2 Screen Setup **
@@ -76,9 +73,14 @@ int8_t Setup(void)
 	uint32_t SCLK_FREQ =  8000000 ; // HW Spi freq in Hertz , MAX 125 Mhz MIN 30Khz
 	uint8_t SPI_CE_PIN = 0; // which HW SPI chip enable pin to use,  0 or 1
 	// pass enum to param1 ,4 choices,see README
-	if(!myTFT.TFTInitPCBType(myTFT.TFT_ST7735S_Black, SCLK_FREQ, SPI_CE_PIN))return -1;
-	// Note : if using SW SPI you do not have to pass anything for param 2&3, it will do nothing. 
+		if(myTFT.TFTInitPCBType(myTFT.TFT_ST7735R_Red, SCLK_FREQ, SPI_CE_PIN) != 0)
+	{
+		bcm2835_close(); //Close lib & /dev/mem, deallocating mem
+		return 3;
+	}
 //*****************************
+	std::cout << "ST7735 library version : " << myTFT.TFTLibVerNumGet()<< std::endl;
+	TFT_MILLISEC_DELAY(50);
 	return 0;
 }
 
@@ -98,9 +100,9 @@ void TestFPS(void) {
 		loadImage((char*)"bitmap/bitmapFPSimages/game2.bmp"),
 		loadImage((char*)"bitmap/bitmapFPSimages/game3.bmp")
 	};
-	for (uint8_t i=0; i<5 ;i++) // Did any loadImage call return NULL
+	for (uint8_t i=0; i<5 ;i++) // Did any loadImage call return nullptr
 	{
-		if (img[i] == NULL){ 
+		if (img[i] == nullptr){ 
 			for(uint8_t j=0; j<5; j++) free(img[j]); // Free Up Buffer if set
 			TFT_MILLISEC_DELAY(TEST_DELAY1);
 			return;
@@ -155,18 +157,18 @@ int64_t getTime() {
 uint8_t* loadImage(char* name) {
 	FILE *pFile ;
 	size_t pixelSize = 3;
-	uint8_t* bmpBuffer1 = NULL;
+	uint8_t* bmpBuffer1 = nullptr;
 
 	pFile = fopen(name, "r");
-	if (pFile == NULL) {
+	if (pFile == nullptr) {
 		std::cout << "Error TestFPS : File does not exist" << std::endl;
-		return NULL;
+		return nullptr;
 	} else {
 		bmpBuffer1 = (uint8_t*)malloc((160 * 80) * pixelSize);
-		if (bmpBuffer1 == NULL)
+		if (bmpBuffer1 == nullptr)
 		{
 			std::cout << "Error TestFPS : MALLOC could not assign memory " << std::endl;
-			return NULL;
+			return nullptr;
 		}
 		fseek(pFile, 132, 0);
 		fread(bmpBuffer1, pixelSize, 160 * 80, pFile);

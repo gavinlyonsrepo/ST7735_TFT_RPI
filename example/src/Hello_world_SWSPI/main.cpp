@@ -1,10 +1,10 @@
 /*! 
-	@file src/Hello_world/main.cpp
-	@brief Hello World hardware SPI test
+	@file src/Hello_world_SWSPI/main.cpp
+	@brief Hello World software SPI test
 	@author Gavin Lyons.
 	@note See USER OPTIONS 1-3 in SETUP function, run as sudo
 	@test 
-		-# 901 Hello World Hardware SPI
+		-# 801 Hello World Software SPI
 */
 
 // Section ::  libraries 
@@ -19,6 +19,7 @@ ST7735_TFT myTFT;
 uint8_t Setup(void); // setup + user options
 void HelloWorld(void);
 void EndTests(void);
+
 
 //  Section ::  MAIN loop
 
@@ -46,10 +47,13 @@ uint8_t Setup(void)
 		std::cout <<"bcm2835 library version :" << bcm2835_version() << std::endl;
 	}
 	
-// ** USER OPTION 1 GPIO HW SPI **
+// ** USER OPTION 1 GPIO/SPI TYPE SW **
 	int8_t RST_TFT  = 25;
 	int8_t DC_TFT   = 24;
-	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT);
+	int8_t SCLK_TFT = 5;
+	int8_t SDIN_TFT = 6;
+	int8_t CS_TFT   = 8;
+	myTFT.TFTSetupGPIO(RST_TFT, DC_TFT, CS_TFT, SCLK_TFT, SDIN_TFT);
 //*********************************************
 
 // ** USER OPTION 2 Screen Setup **
@@ -60,17 +64,17 @@ uint8_t Setup(void)
 	myTFT.TFTInitScreenSize(OFFSET_COL, OFFSET_ROW , TFT_WIDTH , TFT_HEIGHT);
 // ***********************************
 
-// ** USER OPTION 3 PCB_TYPE + SPI baud rate + SPI_CE_PIN**
-	uint32_t SCLK_FREQ =  8000000 ; //  freq in Hertz , MAX 125 Mhz MIN 30Khz
-	uint8_t SPI_CE_PIN = 0; // which HW SPI chip enable pin to use,  0 or 1
+// ** USER OPTION 3 PCB_TYPE **
+	uint16_t SWSPI_CommDelay = 0; //uS GPIO SW SPI delay
 	// pass enum to param1 ,4 choices,see README
-	if(myTFT.TFTInitPCBType(myTFT.TFT_ST7735R_Red, SCLK_FREQ, SPI_CE_PIN) != 0)
+	if(myTFT.TFTInitPCBType(myTFT.TFT_ST7735R_Red, SWSPI_CommDelay) != 0)
 	{
 		bcm2835_close(); //Close lib & /dev/mem, deallocating mem
 		return 3;
 	}
 //*****************************
 	std::cout << "ST7735 library version : " << myTFT.TFTLibVerNumGet()<< std::endl;
+	std::cout << "SWSPI Comm GPIO Delay set to : " << myTFT.HighFreqDelayGet()<< "uS" << std::endl;
 	TFT_MILLISEC_DELAY(50);
 	return 0;
 }

@@ -14,20 +14,31 @@
 # Comment out the others. #
 
 SRC=src/Hello_world
-#SRC=src/Tests
+#SRC=src/Hello_world_SWSPI
+#SRC=src/Text_Tests
+#SRC=src/Graphic_Tests
+#SRC=src/Function_Tests
+#SRC=src/Bitmap_Tests
 #SRC=src/Frame_rate_test
+#SRC=src/Frame_rate_test_2
 # ************************************************
 
+# lang c plus plus
 CC=g++
+# Linker flags :: note -lrt onyl needed for Bitmap and FPS examples
 LDFLAGS= -lbcm2835 -lrt -lST7735_TFT_RPI
+# Complier flags
 CFLAGS = -Iinclude/  -c -Wall 
 
 MD=mkdir
+# Complier Directories
 OBJ=obj
 SRCS = $(wildcard $(SRC)/*.cpp)
 OBJS = $(patsubst $(SRC)/%.cpp,  $(OBJ)/%.o, $(SRCS))
+
+# Executable path
 BIN=./bin
-TARGET=$(BIN)/test
+TARGET=$(BIN)/exampleTest.out
 
 all: clean pre-build $(TARGET) 
 
