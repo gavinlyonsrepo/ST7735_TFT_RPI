@@ -125,7 +125,9 @@ where user can make adjustments to select for SPI type used, PCB type used and s
 This library supports both Hardware SPI and software SPI.
 The TFTSetupGPIO function is overloaded(2 off one for HW SPI the other for SW SPI).
 The parameters set for TFTSetupGPIO define which is used.
-HW SPI is far faster and more reliable than SW SPI
+HW SPI is far faster and more reliable than SW SPI.
+The SPI settings are set in TFTSPIHWSettings() function internally at init.
+If there are multiple SPI devices on Bus(with different settings) the user can call this method to refresh settings before a tranche of LCD commands.
 
 *USER OPTION 2 Screen size  + Offsets*
 
@@ -136,7 +138,7 @@ The function TFTInitScreenSize sets them.
 
 *USER OPTION 3 PCB Version, SPI SPEED , SPI_CE_PIN*
 
-TFTInitPCBType function is overloaded(2 off one for HW SPI the other for SW SPI).
+TFTInitPCBType function is overloaded(2 off , one for HW SPI the other for SW SPI).
 
 Param1 PCB_TYPE
 
