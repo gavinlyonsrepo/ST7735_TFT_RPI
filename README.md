@@ -9,6 +9,7 @@
 
 
   * [Overview](#overview)
+  * [See Also](#see-also)
   * [Installation](#installation)
   * [Test](#test)
   * [Software](#software)
@@ -19,9 +20,6 @@
       * [Bitmap](#bitmap)  
   * [Hardware](#hardware)
   * [Output](#output)
-  * [Notes and Issues](#notes-and-issues)
-  * [See Also](see-also)
-
 
 ## Overview
 
@@ -46,6 +44,10 @@
 	3. Raspbian , Debian 12 bookworm OS, , 64 bit.
 	4. kernel : aarch64 Linux 6.1.0-rpi7-rpi-v8
 	5. [bcm2835 Library 1.73 dependency](http://www.airspayce.com/mikem/bcm2835/). Provides low level SPI bus, delays and GPIO control.
+
+## See Also
+
+[Combined Display library 'Display_Lib_RPI'](https://github.com/gavinlyonsrepo/Display_Lib_RPI)
 
 ## Installation
 
@@ -283,12 +285,3 @@ Output of some of the test routine's. Left to right, top to bottom.
 ![ pic ](https://github.com/gavinlyonsrepo/pic_16F18346_projects/blob/master/images/st7735/9.jpg)
 ![ pic1 ](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/4.jpg)
 ![ p2](https://github.com/gavinlyonsrepo/ST7735_TFT_RPI/blob/main/extra/images/5.jpg)
-
-## Notes and Issues
-
-
-
-## See Also
-
-[Combined Display library 'Display_Lib_RPI'](https://github.com/gavinlyonsrepo/Display_Lib_RPI)
-
