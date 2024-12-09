@@ -13,11 +13,11 @@
   * [Installation](#installation)
   * [Test](#test)
   * [Software](#software)
-      * [API documentation](#api-documentation)
       * [User Options](#user-options)
       * [File system](#file-system)
       * [Fonts](#fonts)
       * [Bitmap](#bitmap)  
+      * [Tool chain](#tool-chain)  
   * [Hardware](#hardware)
   * [Output](#output)
 
@@ -38,16 +38,11 @@
 * Author: Gavin Lyons
 * Port of my PIC library at [github link.](https://github.com/gavinlyonsrepo/pic_16F18346_projects)
 
-* Development Tool chain. 
-	1. Raspberry PI 3 model b
-	2. C++, g++ (Debian 12.2.0) 
-	3. Raspbian , Debian 12 bookworm OS, , 64 bit.
-	4. kernel : aarch64 Linux 6.1.0-rpi7-rpi-v8
-	5. [bcm2835 Library 1.73 dependency](http://www.airspayce.com/mikem/bcm2835/). Provides low level SPI bus, delays and GPIO control.
 
 ## See Also
 
-[Combined Display library 'Display_Lib_RPI'](https://github.com/gavinlyonsrepo/Display_Lib_RPI)
+The ST7735_TFT_RPI library has been amalgamated into my combined display library ['Display_Lib_RPI.'](https://github.com/gavinlyonsrepo/Display_Lib_RPI)
+Which is under active development and should work on any Linux based single board computer.
 
 ## Installation
 
@@ -105,11 +100,6 @@ Pick an example "SRC" directory path and ONE ONLY.
 
 
 ## Software
-
-### API documentation
-
-The Software is commented for "doxygen". If users uses "doxygen" software
-an application programming interface document can be generated.
 
 ### User options
 
@@ -243,6 +233,15 @@ There are four functions to support drawing bitmaps
 The TFTdrawBitmap function will return an error if : The Bitmap is completely off screen or 
 Invalid Bitmap pointer object. The TFTdrawBitmapXX functions will also return an error if memory
 be assigned. All 4 function's will return 0 for success.
+
+### Tool chain
+
+* Development Tool chain. 
+	1. Raspberry PI 3 model b
+	2. C++, g++ (Debian 12.2.0) 
+	3. Raspbian , Debian 12 bookworm OS, , 64 bit.
+	4. kernel : aarch64 Linux 6.1.0-rpi7-rpi-v8
+	5. [bcm2835 Library 1.73 dependency](http://www.airspayce.com/mikem/bcm2835/). Provides low level SPI bus, delays and GPIO control.
 
 ## Hardware
 
